@@ -1,0 +1,340 @@
+{% extends 'talents/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    /* HERO SECTION */
+    .hero-section {
+        padding: 100px 0 80px 0;
+        background: linear-gradient(to bottom, #ffffff, #f9fafb);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-title {
+        font-weight: 800;
+        letter-spacing: -1px;
+        line-height: 1.1;
+        background: linear-gradient(135deg, #111 0%, #333 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-img-landing {
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        border: 1px solid rgba(0,0,0,0.05);
+        transform: perspective(1000px) rotateY(-5deg);
+        transition: transform 0.5s ease;
+    }
+    .hero-img-landing:hover {
+        transform: perspective(1000px) rotateY(0deg);
+    }
+
+    /* PREMIUM TALENT CARD STYLES */
+    .talent-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        height: 100%;
+        position: relative;
+    }
+    
+    .talent-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+        border-color: transparent;
+    }
+    
+    .card-img-wrapper {
+        height: 220px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .card-img-top {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .talent-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+    
+    .card-body { padding: 25px; }
+    
+    .talent-name { 
+        font-weight: 800; font-size: 1.1rem; color: #111; text-decoration: none; display: block; margin-bottom: 5px;
+    }
+    
+    .verified-badge { color: #1d9bf0; margin-left: 5px; font-size: 0.9em; }
+    
+    .talent-bio {
+        font-size: 0.9rem; color: #6b7280; margin-bottom: 15px;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    
+    .skill-tag {
+        font-size: 0.75rem; background: #f3f4f6; color: #4b5563; padding: 4px 10px;
+        border-radius: 6px; margin-right: 5px; font-weight: 600; display: inline-block; margin-bottom: 5px;
+    }
+    
+    .card-footer-custom {
+        padding-top: 15px; border-top: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;
+    }
+
+    /* LOCKED CONTENT STYLING (For Guests) */
+    .locked-overlay {
+        position: relative;
+        padding: 60px 20px;
+        background: #f8f9fa;
+        border-radius: 20px;
+        border: 1px dashed #cbd5e1;
+        text-align: center;
+        overflow: hidden;
+    }
+    .blur-bg {
+        filter: blur(8px);
+        opacity: 0.6;
+        pointer-events: none;
+        user-select: none;
+    }
+    .lock-message {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        background: rgba(255,255,255,0.95);
+        padding: 30px 40px;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        border: 1px solid #e5e7eb;
+    }
+
+    /* FEATURES & ICONS */
+    .feature-icon-box {
+        width: 60px; height: 60px; background: #f3f4f6; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; color: #764ba2; margin-bottom: 20px;
+    }
+
+    /* Mobile Tweaks */
+    @media (max-width: 992px) {
+        .hero-section { padding: 60px 0; text-align: center; }
+        .hero-img-landing { display: none; }
+        .hero-btns { justify-content: center; }
+    }
+</style>
+
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            
+            <div class="col-lg-6">
+                <div class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold mb-4">
+                    <i class="fas fa-star me-2"></i> #1 Platform for Top Talent
+                </div>
+                <h1 class="display-3 hero-title mb-4">
+                    Discover Verified<br> Professionals.
+                </h1>
+                <p class="lead text-muted mb-5" style="line-height: 1.8;">
+                    Connect with expert developers, designers, and creatives. 
+                    TalentHub makes hiring safe, fast, and transparent.
+                </p>
+                <div class="d-flex gap-3 hero-btns">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'browse' %}" class="btn btn-dark btn-lg rounded-pill px-5 fw-bold shadow-lg">Browse Talents</a>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-dark btn-lg rounded-pill px-5 fw-bold">My Dashboard</a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="btn btn-dark btn-lg rounded-pill px-5 fw-bold shadow-lg">Get Started</a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-dark btn-lg rounded-pill px-5 fw-bold">Log In</a>
+                    {% endif %}
+                </div>
+                
+                <div class="mt-5 text-muted small">
+                    <i class="fas fa-check-circle text-success me-2"></i> No hidden fees
+                    <span class="mx-3">•</span>
+                    <i class="fas fa-check-circle text-success me-2"></i> Verified Profiles
+                </div>
+            </div>
+
+            <div class="col-lg-6 text-center ps-lg-5 mt-5 mt-lg-0">
+                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                     class="img-fluid rounded-4 hero-img-landing" alt="Team working">
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="py-5 border-top border-bottom bg-white">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h2 class="fw-bold m-0">500+</h2>
+                <p class="text-muted small text-uppercase fw-bold">Active Talents</p>
+            </div>
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h2 class="fw-bold m-0">1.2k</h2>
+                <p class="text-muted small text-uppercase fw-bold">Projects Completed</p>
+            </div>
+            <div class="col-md-4">
+                <h2 class="fw-bold m-0">98%</h2>
+                <p class="text-muted small text-uppercase fw-bold">Client Satisfaction</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container py-lg-5">
+        
+        <div class="text-center mb-5">
+            <h6 class="text-uppercase text-primary fw-bold letter-spacing-2">Top Professionals</h6>
+            <h2 class="fw-bold display-6">Hire the best talent.</h2>
+            <p class="text-muted" style="max-width: 500px; margin: 0 auto;">
+                Verified experts ready to work on your next project.
+            </p>
+        </div>
+
+        {% if user.is_authenticated %}
+            <div class="row g-4">
+                {% for talent in talents %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="talent-card">
+                        <div class="card-img-wrapper">
+                            <a href="{% url 'profile_detail' talent.pk %}">
+                                <img src="{{ talent.profile_pic.url }}" class="card-img-top" alt="{{ talent.user.username }}">
+                            </a>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <a href="{% url 'profile_detail' talent.pk %}" class="talent-name">
+                                        {{ talent.user.first_name }} {{ talent.user.last_name }}
+                                        {% if talent.is_verified %}
+                                            <i class="fas fa-check-circle verified-badge" title="Verified"></i>
+                                        {% endif %}
+                                    </a>
+                                    {% if not talent.user.first_name %}
+                                        <a href="{% url 'profile_detail' talent.pk %}" class="talent-name">@{{ talent.user.username }}</a>
+                                    {% endif %}
+                                    <small class="text-muted fw-bold" style="font-size: 0.8rem;">
+                                        {{ talent.skills.first.name|default:"Professional" }}
+                                    </small>
+                                </div>
+                            </div>
+
+                            <p class="talent-bio mt-3">
+                                {{ talent.bio|default:"Available for hire on TalentHub."|truncatewords:15 }}
+                            </p>
+
+                            <div class="mb-3">
+                                {% for skill in talent.skills.all|slice:":2" %}
+                                    <span class="skill-tag">{{ skill.name }}</span>
+                                {% empty %}
+                                    <span class="text-muted small">No skills listed</span>
+                                {% endfor %}
+                                {% if talent.skills.count > 2 %}
+                                    <span class="text-muted small ms-1">+{{ talent.skills.count|add:"-2" }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="card-footer-custom">
+                                <div>
+                                    <span class="fw-bold text-dark fs-5">
+                                        {% if talent.hourly_rate %}
+                                            ${{ talent.hourly_rate }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </span>
+                                    <small class="text-muted">/hr</small>
+                                </div>
+                                <a href="{% url 'profile_detail' talent.pk %}" class="btn btn-outline-dark rounded-pill px-4 fw-bold btn-sm">View Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted">No featured talents available yet.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="{% url 'browse' %}" class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-sm">
+                    Browse All Talents <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+
+        {% else %}
+            <div class="locked-overlay">
+                <div class="lock-message">
+                    <div class="mb-3">
+                        <div class="bg-light d-inline-block p-3 rounded-circle">
+                            <i class="fas fa-lock fa-2x text-dark"></i>
+                        </div>
+                    </div>
+                    <h4 class="fw-bold">Login to View Talents</h4>
+                    <p class="text-muted mb-4">Join our community to access 500+ verified professionals and view their full profiles.</p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a href="{% url 'login' %}" class="btn btn-dark px-4 rounded-pill fw-bold">Log In</a>
+                        <a href="{% url 'register' %}" class="btn btn-outline-dark px-4 rounded-pill fw-bold">Sign Up</a>
+                    </div>
+                </div>
+
+                <div class="row g-4 blur-bg">
+                    <div class="col-md-4"><div class="bg-white p-5 rounded-4 h-100 shadow-sm"></div></div>
+                    <div class="col-md-4"><div class="bg-white p-5 rounded-4 h-100 shadow-sm"></div></div>
+                    <div class="col-md-4"><div class="bg-white p-5 rounded-4 h-100 shadow-sm"></div></div>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+</section>
+
+<section class="py-5 bg-white">
+    <div class="container py-lg-5">
+        <div class="row g-5">
+            <div class="col-lg-4">
+                <div class="feature-icon-box">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h4>Verified Profiles</h4>
+                <p class="text-muted">Every talent on our platform undergoes a strict verification process to ensure quality.</p>
+            </div>
+            <div class="col-lg-4">
+                <div class="feature-icon-box">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h4>Fast Hiring</h4>
+                <p class="text-muted">Connect directly with professionals. No middleman, no delays. Start working today.</p>
+            </div>
+            <div class="col-lg-4">
+                <div class="feature-icon-box">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h4>Secure Payments</h4>
+                <p class="text-muted">Your work and payments are protected. We prioritize security for both clients and talents.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-dark text-white text-center">
+    <div class="container py-5">
+        <h2 class="display-5 fw-bold mb-3">Ready to get started?</h2>
+        <p class="lead text-white-50 mb-4">Join thousands of professionals building the future.</p>
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg rounded-pill px-5 fw-bold">Join Community</a>
+    </div>
+</section>
+
+{% endblock %}

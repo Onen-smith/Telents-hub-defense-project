@@ -1,0 +1,297 @@
+{% extends 'talents/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    body { background-color: #f8f9fa; }
+
+    /* --- LAYOUT --- */
+    .settings-grid {
+        display: grid;
+        grid-template-columns: 260px 1fr 300px; /* Sidebar | Form | Preview */
+        gap: 25px;
+        align-items: start;
+    }
+
+    /* --- 1. SIDEBAR --- */
+    .settings-sidebar {
+        background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; position: sticky; top: 100px;
+    }
+    .sidebar-link {
+        display: block; padding: 12px 20px; color: #4b5563; text-decoration: none; font-weight: 500; border-left: 3px solid transparent; transition: all 0.2s;
+    }
+    .sidebar-link:hover { background: #f9fafb; color: #111; }
+    .sidebar-link.active { background: #f0fdf4; color: #166534; border-left-color: #166534; font-weight: 600; }
+
+    /* --- 2. MAIN FORM CARD --- */
+    .settings-card {
+        background: white; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .form-section-title {
+        font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;
+    }
+    .modern-input {
+        width: 100%; padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb; transition: all 0.3s;
+    }
+    .modern-input:focus { background: white; border-color: #764ba2; box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1); outline: none; }
+
+    /* Custom File Upload Button */
+    .upload-btn-wrapper {
+        position: relative; overflow: hidden; display: inline-block; cursor: pointer;
+    }
+    .btn-upload-style {
+        border: 1px solid #e5e7eb; background: white; color: #333; padding: 8px 15px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
+    }
+    .upload-btn-wrapper input[type=file] {
+        font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer;
+    }
+
+    /* --- 3. LIVE PREVIEW CARD --- */
+    .preview-container { position: sticky; top: 100px; }
+    .preview-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #9ca3af; margin-bottom: 10px; display: block; text-align: center; }
+    
+    .talent-card-preview {
+        background: white; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+    /* Dynamic Cover */
+    .preview-cover {
+        height: 100px; 
+        background-color: #667eea;
+        background-size: cover; 
+        background-position: center;
+        transition: background-image 0.3s ease;
+    }
+    /* Dynamic Avatar */
+    .preview-avatar {
+        width: 80px; height: 80px; border-radius: 50%; border: 4px solid white; margin-top: -40px; object-fit: cover; background: #fff;
+    }
+
+    /* Mobile Hide */
+    @media (max-width: 992px) {
+        .settings-grid { grid-template-columns: 1fr; }
+        .settings-sidebar, .preview-container { display: none; }
+    }
+</style>
+
+<div class="container py-5">
+
+    <div class="settings-grid">
+        
+        <div class="settings-sidebar">
+            <div class="p-3 border-bottom bg-light">
+                <div class="d-flex align-items-center">
+                    <img src="{{ user.profile.profile_pic.url }}" class="rounded-circle me-2" width="30" height="30" style="object-fit:cover;">
+                    <small class="fw-bold text-truncate" style="max-width: 150px;">@{{ user.username }}</small>
+                </div>
+            </div>
+            <a href="#" class="sidebar-link active"><i class="fas fa-user-edit me-2"></i> Edit Profile</a>
+            <a href="#" class="sidebar-link"><i class="fas fa-shield-alt me-2"></i> Password & Security</a>
+            <div class="border-top mt-2 pt-2">
+                <a href="{% url 'home' %}" class="sidebar-link text-danger"><i class="fas fa-sign-out-alt me-2"></i> Back to Dashboard</a>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            {% if u_form.errors or p_form.errors %}
+    <div class="alert alert-danger alert-dismissible fade show m-4" role="alert">
+        <strong>Please correct the following errors:</strong>
+        
+        {% if u_form.errors %}
+            <ul class="mb-0 mt-2">
+                {% for field, errors in u_form.errors.items %}
+                    <li><strong>{{ field|title }}:</strong> {{ errors|join:", " }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if p_form.errors %}
+            <ul class="mb-0 mt-2">
+                {% for field, errors in p_form.errors.items %}
+                    <li><strong>{{ field|title }}:</strong> {{ errors|join:", " }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+            <div class="p-4 border-bottom">
+                <h5 class="fw-bold m-0">Edit Profile</h5>
+                <small class="text-muted">Update your photo and personal details.</small>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data" class="p-4">
+    {% csrf_token %}
+
+    <div class="form-section-title">Account Info</div>
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <label class="small fw-bold text-muted">Username</label>
+            {{ u_form.username }} </div>
+        <div class="col-md-6">
+            <label class="small fw-bold text-muted">Email Address</label>
+            {{ u_form.email }} </div>
+    </div>
+
+    <div class="form-section-title">Visual Identity</div>
+    
+    <div class="d-flex gap-3 mb-4 align-items-center">
+        <img src="{{ user.profile.profile_pic.url }}" id="imgPreviewAvatar" class="rounded-circle border" width="60" height="60" style="object-fit:cover;">
+        <div class="flex-grow-1">
+            <label class="d-block small fw-bold mb-1">Profile Photo</label>
+            <div class="upload-btn-wrapper">
+                <button class="btn-upload-style" type="button"><i class="fas fa-camera me-1"></i> Change Avatar</button>
+                <input type="file" name="profile_pic" accept="image/*" onchange="readURL(this, 'imgPreviewAvatar'); readURL(this, 'livePreviewAvatar');">
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-3 mb-4 align-items-center">
+        <div id="imgPreviewCoverBox" style="width: 100px; height: 40px; border-radius: 6px; background: #eee; overflow: hidden;">
+            {% if user.profile.cover_photo %}
+                <img src="{{ user.profile.cover_photo.url }}" id="imgPreviewCover" style="width: 100%; height: 100%; object-fit: cover;">
+            {% else %}
+                <div style="width: 100%; height: 100%; background: #ddd;"></div>
+            {% endif %}
+        </div>
+        <div class="flex-grow-1">
+            <label class="d-block small fw-bold mb-1">Cover Photo</label>
+            <div class="upload-btn-wrapper">
+                <button class="btn-upload-style" type="button"><i class="fas fa-image me-1"></i> Change Banner</button>
+                <input type="file" name="cover_photo" accept="image/*" onchange="readCoverURL(this, 'imgPreviewCover'); readCoverURL(this, 'livePreviewCover', true);">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section-title mt-4">Personal Details</div>
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label class="small fw-bold text-muted">First Name</label>
+            {{ u_form.first_name }}
+        </div>
+        <div class="col-md-6">
+            <label class="small fw-bold text-muted">Last Name</label>
+            {{ u_form.last_name }}
+        </div>
+        <div class="col-md-12">
+            <label class="small fw-bold text-muted">Headline / Bio</label>
+            {{ p_form.bio }}
+            <div class="form-text small">Brief description for your card.</div>
+        </div>
+        <div class="col-md-6">
+            <label class="small fw-bold text-muted">Location</label>
+            {{ p_form.location }}
+        </div>
+        <div class="col-md-6">
+            <label class="small fw-bold text-muted">Hourly Rate ($)</label>
+            {{ p_form.hourly_rate }}
+        </div>
+    </div>
+
+    <div class="form-section-title mt-4">Expertise</div>
+    <div class="mb-3">
+        <label class="small fw-bold text-muted">Skills</label>
+        <div class="bg-light border rounded p-2">
+            {{ p_form.skills }}
+        </div>
+        <div class="form-text small">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</div>
+    </div>
+
+    <hr class="my-4">
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-dark px-4 rounded-pill fw-bold">Save Changes</button>
+    </div>
+</form>
+        </div>
+
+        <div class="preview-container">
+            <span class="preview-label">Live Preview</span>
+            <div class="talent-card-preview text-center pb-4">
+                
+                <div class="preview-cover" id="livePreviewCover" 
+                     {% if user.profile.cover_photo %}style="background-image: url('{{ user.profile.cover_photo.url }}');"{% endif %}>
+                </div>
+                
+                <img src="{{ user.profile.profile_pic.url }}" id="livePreviewAvatar" class="preview-avatar shadow-sm">
+                
+                <div class="px-3 mt-2">
+                    <h5 class="fw-bold text-dark mb-0" id="liveName">
+                        {{ user.first_name }} {{ user.last_name }}
+                    </h5>
+                    {% if not user.first_name %}
+                        <h5 class="fw-bold text-dark mb-0" id="liveName">@{{ user.username }}</h5>
+                    {% endif %}
+
+                    <p class="text-muted small mt-2 mb-3" id="liveBio" style="line-height: 1.4;">
+                        {{ user.profile.bio|default:"Your bio will appear here..."|truncatewords:10 }}
+                    </p>
+                    <button class="btn btn-outline-dark btn-sm rounded-pill px-4" disabled>View Profile</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // 1. Preview Avatar (Standard Img Tag)
+    function readURL(input, targetId) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById(targetId).src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // 2. Preview Cover (Background Image logic)
+    function readCoverURL(input, targetId, isBackground=false) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                const el = document.getElementById(targetId);
+                if(isBackground) {
+                    // Update div background image
+                    el.style.backgroundImage = `url('${e.target.result}')`;
+                } else {
+                    // Create img tag if it doesn't exist (first time upload)
+                    if (el.tagName !== 'IMG') {
+                        el.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
+                    } else {
+                        el.src = e.target.result;
+                    }
+                }
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // 3. Live Text Updates
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputs = document.querySelectorAll('input:not([type="file"]), textarea, select');
+        inputs.forEach(i => i.classList.add('modern-input'));
+
+        const fName = document.querySelector('input[name="first_name"]');
+        const lName = document.querySelector('input[name="last_name"]');
+        const bio = document.querySelector('textarea[name="bio"]');
+        const liveName = document.getElementById('liveName');
+        const liveBio = document.getElementById('liveBio');
+
+        function updateName() {
+            liveName.textContent = (fName.value + ' ' + lName.value).trim() || "@{{ user.username }}";
+        }
+        function updateBio() {
+            let t = bio.value;
+            if(t.length > 80) t = t.substring(0, 80) + "...";
+            liveBio.textContent = t || "Your bio will appear here...";
+        }
+
+        if(fName) fName.addEventListener('input', updateName);
+        if(lName) lName.addEventListener('input', updateName);
+        if(bio) bio.addEventListener('input', updateBio);
+    });
+</script>
+
+{% endblock %}

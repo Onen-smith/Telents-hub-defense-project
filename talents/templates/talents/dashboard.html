@@ -1,0 +1,168 @@
+{% extends 'talents/base.html' %}
+
+{% block content %}
+
+<style>
+    body { background-color: #f3f4f6; }
+    
+    /* DASHBOARD GRID */
+    .dash-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 25px;
+    }
+
+    /* CARDS */
+    .dash-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        border: 1px solid #e5e7eb;
+        height: 100%;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    .dash-title {
+        font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #9ca3af; margin-bottom: 20px; letter-spacing: 0.5px;
+    }
+
+    /* WELCOME BANNER */
+    .welcome-banner {
+        background: linear-gradient(135deg, #111 0%, #333 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 40px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+    .welcome-text h1 { font-weight: 800; margin-bottom: 10px; }
+    
+    /* PROGRESS BAR */
+    .progress { height: 10px; border-radius: 10px; background-color: #e5e7eb; }
+    .progress-bar { background-color: #10b981; border-radius: 10px; }
+
+    /* LIST ITEMS */
+    .activity-item {
+        padding: 15px 0;
+        border-bottom: 1px solid #f3f4f6;
+        display: flex;
+        align-items: start;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon {
+        width: 35px; height: 35px; border-radius: 50%; background: #f3f4f6;
+        display: flex; align-items: center; justify-content: center; margin-right: 15px; color: #6b7280;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 992px) {
+        .dash-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="container py-5">
+    
+    <div class="welcome-banner">
+        <div class="row align-items-center position-relative" style="z-index: 2;">
+            <div class="col-lg-8">
+                <div class="welcome-text">
+                    <h1>Hello, {{ user.first_name|default:user.username }}!</h1>
+                    <p class="opacity-75 mb-4" style="font-size: 1.1rem;">Here is what's happening with your profile today.</p>
+                    <a href="{% url 'profile_detail' user.profile.pk %}" class="btn btn-light fw-bold rounded-pill px-4">
+                        <i class="fas fa-eye me-2"></i>View Public Profile
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 text-end d-none d-lg-block">
+                <i class="fas fa-chart-line text-white opacity-25" style="font-size: 8rem;"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="dash-grid">
+        
+        <div class="dash-card">
+            <div class="dash-title">Profile Strength</div>
+            
+            <div class="text-center py-4">
+                <h1 class="display-4 fw-bold text-dark mb-0">{{ completeness }}%</h1>
+                <p class="text-muted small">Completion Rate</p>
+            </div>
+
+            <div class="progress mb-3">
+                <div class="progress-bar" role="progressbar" style="width: {{ completeness }}%"></div>
+            </div>
+
+            <ul class="list-unstyled small text-muted mt-4">
+                <li class="mb-2"><i class="fas fa-check-circle {% if user.profile.bio %}text-success{% else %}text-light{% endif %} me-2"></i> Bio Added</li>
+                <li class="mb-2"><i class="fas fa-check-circle {% if user.profile.skills.exists %}text-success{% else %}text-light{% endif %} me-2"></i> Skills Listed</li>
+                <li class="mb-2"><i class="fas fa-check-circle {% if user.profile.cover_photo %}text-success{% else %}text-light{% endif %} me-2"></i> Cover Photo Set</li>
+            </ul>
+
+            <div class="d-grid mt-4">
+                <a href="{% url 'profile_update' %}" class="btn btn-outline-dark btn-sm">Complete Profile</a>
+            </div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-title">Recent Activity</div>
+            
+            <div style="max-height: 300px; overflow-y: auto;">
+                {% for notif in notifications %}
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div>
+                        <p class="mb-0 small fw-bold text-dark">{{ notif.message }}</p>
+                        <small class="text-muted" style="font-size: 0.7rem;">{{ notif.created_at|date:"M d, H:i" }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5">
+                    <p class="text-muted small">No recent activity.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-title">Performance</div>
+            
+            <div class="row g-2 mb-4">
+                <div class="col-6">
+                    <div class="bg-light p-3 rounded text-center">
+                        <h4 class="fw-bold mb-0">{{ reviews.count }}</h4>
+                        <small class="text-muted" style="font-size: 0.7rem;">TOTAL REVIEWS</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="bg-light p-3 rounded text-center">
+                        <h4 class="fw-bold mb-0 text-success">
+                            {% if user.profile.is_verified %}Yes{% else %}No{% endif %}
+                        </h4>
+                        <small class="text-muted" style="font-size: 0.7rem;">VERIFIED</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-title mb-3">Latest Review</div>
+            {% if reviews %}
+                <div class="bg-light p-3 rounded border">
+                    <div class="d-flex justify-content-between mb-2">
+                        <small class="fw-bold">{{ reviews.first.author.username }}</small>
+                        <small class="text-warning"><i class="fas fa-star"></i> {{ reviews.first.rating }}</small>
+                    </div>
+                    <p class="small text-muted mb-0 fst-italic">"{{ reviews.first.comment|truncatewords:10 }}"</p>
+                </div>
+            {% else %}
+                <p class="text-muted small text-center py-3 border rounded border-dashed">
+                    No reviews yet. 
+                </p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

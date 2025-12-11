@@ -1,0 +1,217 @@
+{% extends 'talents/base.html' %}
+
+{% block content %}
+
+<style>
+    /* HIDE NAV/FOOTER FOR IMMERSIVE LOGIN */
+    .navbar, .navbar-premium, footer { display: none !important; }
+    nav + div { display: none !important; }
+
+    body, html { height: 100%; overflow-x: hidden; background-color: #fff; }
+    
+    .login-wrapper { display: flex; min-height: 100vh; width: 100%; }
+
+    /* 1. SIDEBAR (IMAGE + REVIEW) */
+    .login-sidebar {
+        flex: 1; 
+        background: url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') no-repeat center center;
+        background-size: cover;
+        position: relative;
+        display: flex; flex-direction: column; justify-content: space-between; padding: 60px; color: white;
+    }
+    
+    /* Dark Overlay */
+    .login-sidebar::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(to bottom, rgba(30, 30, 45, 0.8), rgba(118, 75, 162, 0.85)); z-index: 1;
+    }
+    
+    .sidebar-content { position: relative; z-index: 2; }
+
+    /* GLASS TESTIMONIAL CARD WITH CAROUSEL */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        padding: 25px;
+        margin-top: 40px;
+        position: relative;
+        z-index: 2;
+        min-height: 180px; /* Fixed height to prevent jumping when text changes */
+        display: flex;
+        align-items: center;
+    }
+
+    /* 2. FORM SIDE */
+    .login-form-side {
+        flex: 0.8;
+        display: flex; flex-direction: column; justify-content: center;
+        padding: 40px 60px; background-color: #ffffff; position: relative;
+    }
+
+    .btn-back-home {
+        position: absolute; top: 30px; right: 30px;
+        text-decoration: none; color: #6c757d; font-weight: 600; font-size: 0.9rem;
+    }
+    .btn-back-home:hover { color: #111; }
+
+    .modern-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; margin-bottom: 6px; }
+    .form-control { background-color: #f9fafb; border: 2px solid #f3f4f6; padding: 12px 15px; border-radius: 8px; font-size: 0.95rem; }
+    .form-control:focus { background-color: #fff; border-color: #764ba2; box-shadow: 0 0 0 4px rgba(118, 75, 162, 0.1); }
+
+    .btn-login {
+        background: #111; border: none; color: white; padding: 14px; border-radius: 8px; font-weight: 700; width: 100%; margin-top: 20px;
+    }
+    .btn-login:hover { background: #333; transform: translateY(-2px); }
+
+    /* RESPONSIVE DESIGN */
+    @media (max-width: 992px) {
+        .login-wrapper { flex-direction: column; }
+
+        .btn-back-home { display: none !important; }
+        
+        .login-sidebar { 
+            display: flex !important; flex: none; height: auto; min-height: 350px; 
+            padding: 40px 30px; justify-content: flex-start;
+        }
+
+        .sidebar-content:first-child { margin-bottom: 20px; }
+        .sidebar-content h4 { font-size: 1.1rem; opacity: 0.9; }
+        .sidebar-content h1 { font-size: 2.4rem; margin-bottom: 15px; line-height: 1.2; }
+        .sidebar-content p.lead-text { display: block !important; font-size: 1.05rem; opacity: 0.9; margin-bottom: 0; }
+        .sidebar-content:last-child { display: none; }
+        
+        .glass-card { margin-top: 20px; padding: 15px; min-height: auto; }
+        .glass-card p { font-size: 0.9rem; margin-bottom: 5px !important; }
+
+        .login-form-side { padding: 40px 25px; flex: 1; }
+    }
+</style>
+
+<div class="login-wrapper">
+    
+    <div class="login-sidebar">
+        <div class="sidebar-content">
+            <h4 class="fw-bold"><i class="fas fa-layer-group me-2"></i>TalentHub</h4>
+        </div>
+        
+        <div class="sidebar-content">
+            <h1 class="display-5 fw-bold mb-3">Welcome Back!</h1>
+            <p class="text-white-50 mb-0 lead-text" style="max-width: 400px; font-size: 1.1rem;">
+                Login to access your dashboard and connect with global talent.
+            </p>
+        </div>
+
+        <div class="glass-card">
+            <div id="loginReviews" class="carousel slide carousel-fade w-100" data-bs-ride="carousel" data-bs-interval="5000">
+                <div class="carousel-inner">
+                    
+                    <div class="carousel-item active">
+                        <div class="mb-2 text-warning small">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="fst-italic mb-3 text-white" style="font-size: 1rem; line-height: 1.5; opacity: 0.9;">
+                            "Clean interface and easy to use. I found the perfect developer in record time."
+                        </p>
+                        <div class="d-flex align-items-center">
+                            <h6 class="fw-bold m-0 me-2 text-white" style="font-size: 0.9rem;">- Amara K.</h6>
+                            <small class="text-white-50" style="font-size: 0.8rem;">HR Manager</small>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="mb-2 text-warning small">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="fst-italic mb-3 text-white" style="font-size: 1rem; line-height: 1.5; opacity: 0.9;">
+                            "The verification process gave me peace of mind. Highly recommended platform."
+                        </p>
+                        <div class="d-flex align-items-center">
+                            <h6 class="fw-bold m-0 me-2 text-white" style="font-size: 0.9rem;">- David O.</h6>
+                            <small class="text-white-50" style="font-size: 0.8rem;">Tech Lead</small>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="mb-2 text-warning small">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <p class="fst-italic mb-3 text-white" style="font-size: 1rem; line-height: 1.5; opacity: 0.9;">
+                            "Managing my profile and getting gigs has never been smoother. Great job!"
+                        </p>
+                        <div class="d-flex align-items-center">
+                            <h6 class="fw-bold m-0 me-2 text-white" style="font-size: 0.9rem;">- Sarah J.</h6>
+                            <small class="text-white-50" style="font-size: 0.8rem;">Freelancer</small>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-content mt-4 d-none d-lg-block">
+            <small class="text-white-50">&copy; 2025 TalentHub Inc.</small>
+        </div>
+    </div>
+
+    <div class="login-form-side">
+        <a href="{% url 'home' %}" class="btn-back-home"><i class="fas fa-times me-1"></i> Close</a>
+
+        <div style="max-width: 400px; margin: 0 auto; width: 100%;">
+            <div class="mb-4">
+                <h2 class="fw-bold text-dark mb-1">Sign In</h2>
+                <p class="text-muted small">Enter your credentials to continue.</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger border-0 shadow-sm rounded-3 py-2 px-3 mb-3 small">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <div>{{ message }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger border-0 shadow-sm rounded-3 py-2 px-3 mb-3 small">
+                    {% for error in form.non_field_errors %}
+                        <div><i class="fas fa-exclamation-circle me-2"></i> {{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="modern-label">Username</label>
+                    <input type="text" name="username" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label class="modern-label">Password</label>
+                        <a href="#" class="small text-muted fw-bold" style="font-size: 0.75rem; text-decoration:none;">Forgot password?</a>
+                    </div>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn-login">Log In</button>
+            </form>
+
+            <div class="text-center mt-4">
+                <p class="text-muted small">Don't have an account? <a href="{% url 'register' %}" class="fw-bold text-decoration-none" style="color: #764ba2;">Join Community</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('input').forEach(input => {
+            input.classList.add('form-control');
+        });
+    });
+</script>
+{% endblock %}

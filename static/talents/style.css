@@ -1,0 +1,62 @@
+/* Custom Polish */
+body {
+    background-color: #f8f9fa; /* Light grey background like the image */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hero-section {
+    background-color: #ffffff;
+    padding: 80px 0;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.search-bar {
+    max-width: 600px;
+    margin: 0 auto;
+    border-radius: 50px; /* Round search bar */
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.search-input {
+    border: none;
+    padding: 15px 25px;
+    font-size: 1.1rem;
+}
+
+.search-btn {
+    border-radius: 0 50px 50px 0;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.talent-card {
+    border: none;
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: white;
+}
+
+.talent-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.category-pill {
+    border-radius: 20px;
+    padding: 8px 20px;
+    margin: 5px;
+    font-size: 0.9rem;
+    background: white;
+    border: 1px solid #dee2e6;
+    color: #555;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.category-pill:hover {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}

@@ -1,0 +1,240 @@
+{% extends 'talents/base.html' %}
+
+{% block content %}
+
+<style>
+    /* 1. Hero Header */
+    .careers-header {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        color: white;
+        padding: 80px 0;
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    /* 2. Job Card Styling */
+    .job-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        background: white;
+        margin-bottom: 20px;
+    }
+    
+    .job-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        border-color: #667eea; /* Purple accent on hover */
+    }
+
+    /* 3. Badge Styling */
+    .badge-soft {
+        background-color: #f3f4f6;
+        color: #4b5563;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+    }
+
+    /* 4. Responsive Layout Fixes */
+    /* On mobile, we center text and make button full width. On desktop, we align left/right. */
+    .job-card-body {
+        display: flex;
+        flex-direction: column; /* Stack vertically by default (Mobile) */
+        text-align: center;
+        padding: 25px;
+    }
+
+    @media (min-width: 768px) {
+        .job-card-body {
+            flex-direction: row; /* Side by side on Desktop */
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+        }
+    }
+
+    /* 5. Perks Section */
+    .perk-box {
+        text-align: center;
+        padding: 30px;
+        background: #f9fafb;
+        border-radius: 15px;
+        height: 100%;
+    }
+    .perk-icon {
+        width: 60px; height: 60px;
+        background: white;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        color: #764ba2;
+        font-size: 1.5rem;
+    }
+</style>
+
+<div class="careers-header">
+    <div class="container">
+        <h1 class="fw-bold display-5 mb-3">Join Our Mission</h1>
+        <p class="lead text-white-50 mx-auto" style="max-width: 600px;">
+            We are building the future of freelance work in Nigeria. Come help us connect talent with opportunity.
+        </p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h4 class="fw-bold mb-4">Open Positions</h4>
+
+            <div class="job-card">
+                <div class="job-card-body">
+                    <div class="mb-3 mb-md-0"> <h5 class="fw-bold mb-1">Senior Django Developer</h5>
+                        <div class="mt-2">
+                            <span class="badge-soft me-2"><i class="fas fa-map-marker-alt me-1"></i> Remote</span>
+                            <span class="badge-soft"><i class="fas fa-clock me-1"></i> Full Time</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-dark rounded-pill px-4 w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#applyModal">Apply Now
+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="job-card">
+                <div class="job-card-body">
+                    <div class="mb-3 mb-md-0">
+                        <h5 class="fw-bold mb-1">Product Designer (UI/UX)</h5>
+                        <div class="mt-2">
+                            <span class="badge-soft me-2"><i class="fas fa-map-marker-alt me-1"></i> Lagos, NG</span>
+                            <span class="badge-soft"><i class="fas fa-clock me-1"></i> Hybrid</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-dark rounded-pill px-4 w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#applyModal">
+    Apply Now
+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="job-card">
+                <div class="job-card-body">
+                    <div class="mb-3 mb-md-0">
+                        <h5 class="fw-bold mb-1">Marketing Manager</h5>
+                        <div class="mt-2">
+                            <span class="badge-soft me-2"><i class="fas fa-map-marker-alt me-1"></i> Abuja, NG</span>
+                            <span class="badge-soft"><i class="fas fa-clock me-1"></i> Full Time</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-dark rounded-pill px-4 w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#applyModal">
+    Apply Now
+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="job-card">
+                <div class="job-card-body">
+                    <div class="mb-3 mb-md-0">
+                        <h5 class="fw-bold mb-1">Customer Success Specialist</h5>
+                        <div class="mt-2">
+                            <span class="badge-soft me-2"><i class="fas fa-map-marker-alt me-1"></i> Remote</span>
+                            <span class="badge-soft"><i class="fas fa-clock me-1"></i> Contract</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-dark rounded-pill px-4 w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#applyModal">
+    Apply Now
+</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="py-5 bg-white border-top">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold">Why join TalentHub?</h3>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="perk-box">
+                    <div class="perk-icon"><i class="fas fa-heartbeat"></i></div>
+                    <h5 class="fw-bold">Health & Wellness</h5>
+                    <p class="text-muted small">Comprehensive health insurance for you and your family.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="perk-box">
+                    <div class="perk-icon"><i class="fas fa-laptop-house"></i></div>
+                    <h5 class="fw-bold">Remote Friendly</h5>
+                    <p class="text-muted small">Work from anywhere. We value output over hours.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="perk-box">
+                    <div class="perk-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <h5 class="fw-bold">Learning Budget</h5>
+                    <p class="text-muted small">Annual stipend for courses, books, and conferences.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="applyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            
+            <div class="modal-header border-0 p-4 pb-0">
+                <h5 class="fw-bold">Apply for Position</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <p class="text-muted small mb-4">Please fill out the form below. Our HR team will review your application and get back to you.</p>
+                
+                <form method="POST" action="{% url 'contact' %}">
+                    {% csrf_token %}
+                    
+                    <input type="hidden" name="subject" value="New Job Application">
+
+                    <div class="mb-3">
+                        <label class="fw-bold small text-uppercase text-muted">Full Name</label>
+                        <input type="text" name="name" class="form-control bg-light border-0 py-2" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="fw-bold small text-uppercase text-muted">Email Address</label>
+                        <input type="email" name="email" class="form-control bg-light border-0 py-2" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="fw-bold small text-uppercase text-muted">Portfolio / LinkedIn URL</label>
+                        <input type="url" name="message" class="form-control bg-light border-0 py-2" placeholder="https://..." required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="fw-bold small text-uppercase text-muted">Upload CV</label>
+                        <input type="file" class="form-control border-0 bg-light">
+                        <small class="text-muted" style="font-size: 0.7rem;">PDF or DOCX only.</small>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary fw-bold py-2 rounded-pill">Submit Application</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

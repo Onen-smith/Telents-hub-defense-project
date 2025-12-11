@@ -1,0 +1,296 @@
+{% extends 'talents/base.html' %}
+
+{% block content %}
+
+<style>
+    /* 1. HERO HEADER (The Dark Banner or Custom Image) */
+    .profile-cover {
+        height: 220px;
+        /* Default fallback background if no image */
+        background-color: #1f2937; 
+        border-radius: 0 0 20px 20px;
+        position: relative;
+        margin-bottom: 90px; /* Space for the overlapping avatar */
+        background-size: cover;
+        background-position: center;
+    }
+
+    /* 2. OVERLAPPING AVATAR */
+    .profile-avatar-large {
+        width: 170px;
+        height: 170px;
+        border-radius: 15px; /* Square with soft corners */
+        border: 5px solid white;
+        object-fit: cover;
+        position: absolute;
+        bottom: -70px; /* Pushes it half out of the banner */
+        left: 50px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        background: white;
+    }
+
+    /* 3. CARD STYLING */
+    .pro-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
+
+    /* 4. SKILL BADGES */
+    .skill-badge {
+        background-color: #f3f4f6;
+        color: #374151;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-block;
+        margin: 0 6px 10px 0;
+        border: 1px solid #e5e7eb;
+    }
+
+    /* 5. REVIEWS */
+    .review-box {
+        border-bottom: 1px solid #f3f4f6;
+        padding-bottom: 25px;
+        margin-bottom: 25px;
+    }
+    .review-box:last-child { border-bottom: none; }
+    
+    .review-avatar {
+        width: 45px; height: 45px;
+        background: #e5e7eb;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: bold; color: #6b7280;
+        font-size: 1.1rem;
+    }
+
+    /* 6. MOBILE FLOATING EDIT BUTTON (New Addition) */
+    .mobile-edit-fab {
+        display: none; /* Hidden on desktop */
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background: #111; /* Black Button */
+        color: white;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        z-index: 1000;
+        text-decoration: none;
+        transition: transform 0.2s;
+    }
+    .mobile-edit-fab:active { transform: scale(0.9); }
+
+    /* RESPONSIVE TWEAKS */
+    @media (max-width: 768px) {
+        /* Hide the normal edit button on mobile */
+        .desktop-edit-btn { display: none !important; }
+        
+        /* Show the floating button on mobile */
+        .mobile-edit-fab { display: flex; }
+
+        /* Center avatar on mobile */
+        .profile-avatar-large {
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -50px;
+            width: 140px; height: 140px;
+        }
+        .profile-cover { margin-bottom: 70px; height: 180px; }
+        
+        /* Center text on mobile */
+        .pro-card.pt-4 { text-align: center; }
+        .pro-card.pt-4 hr { margin-left: auto; margin-right: auto; width: 50%; }
+        .d-flex.align-items-center { justify-content: center; } /* Center icons/text */
+    }
+</style>
+
+<div class="container px-0">
+    <div class="profile-cover" 
+         style="{% if talent.cover_photo %}background-image: url('{{ talent.cover_photo.url }}');{% else %}background: linear-gradient(135deg, #1f2937 0%, #111827 100%);{% endif %}">
+        
+        <a href="{% url 'home' %}" class="btn btn-sm btn-light bg-white bg-opacity-25 border-0 text-white position-absolute top-0 start-0 m-4">
+            <i class="fas fa-arrow-left me-2"></i>Back to Directory
+        </a>
+
+        <img src="{{ talent.profile_pic.url }}" class="profile-avatar-large">
+        
+        <div class="position-absolute bottom-0 end-0 m-4 d-none d-md-block">
+            {% if user.is_authenticated and user.profile.pk != talent.pk %}
+                <a href="mailto:{{ talent.user.email }}" class="btn btn-light fw-bold shadow-sm">
+                    <i class="fas fa-envelope me-2"></i>Contact Me
+                </a>
+            {% endif %}
+            
+            {% if user.profile.pk == talent.pk %}
+                 <a href="{% url 'profile_update' %}" class="btn btn-primary fw-bold shadow-sm desktop-edit-btn">
+                    <i class="fas fa-pen me-2"></i>Edit Profile
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row">
+        
+        <div class="col-lg-4">
+            <div class="pro-card pt-4"> 
+                <h2 class="fw-bold mb-1">
+                    {{ talent.user.first_name }} {{ talent.user.last_name }}
+                    {% if talent.is_verified %}
+                        <i class="fas fa-check-circle text-primary" title="Verified" style="font-size: 0.6em; vertical-align: middle;"></i>
+                    {% endif %}
+                </h2>
+                {% if not talent.user.first_name %}
+                    <h4 class="fw-bold mb-1">@{{ talent.user.username }}</h4>
+                {% endif %}
+
+                <p class="text-primary fw-bold mb-4">
+                    {% for skill in talent.skills.all|slice:":1" %}{{ skill.name }}{% empty %}Talent{% endfor %}
+                </p>
+                
+                <hr class="text-muted opacity-25">
+
+                <div class="mt-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-map-marker-alt text-muted me-3 fa-lg" style="width:20px;"></i>
+                        <div>
+                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">Location</small>
+                            <span class="fw-bold">{{ talent.location|default:"Not set" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-wallet text-muted me-3 fa-lg" style="width:20px;"></i>
+                        <div>
+                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">Hourly Rate</small>
+                            <span class="fw-bold">${{ talent.hourly_rate|default:"Negotiable" }}/hr</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-star text-warning me-3 fa-lg" style="width:20px;"></i>
+                        <div>
+                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">Rating</small>
+                            <span class="fw-bold">
+                                {% if avg_rating %}{{ avg_rating|floatformat:1 }} / 5.0{% else %}New Talent{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            
+            <div class="pro-card">
+                <h5 class="fw-bold mb-3 border-bottom pb-3">About</h5>
+                <p class="text-muted mb-5" style="line-height: 1.8; font-size: 1.05rem;">
+                    {{ talent.bio|default:"No bio provided yet."|linebreaks }}
+                </p>
+
+                <h5 class="fw-bold mb-3 border-bottom pb-3">Skills</h5>
+                <div>
+                    {% for skill in talent.skills.all %}
+                        <span class="skill-badge">{{ skill.name }}</span>
+                    {% empty %}
+                        <span class="text-muted fst-italic">No specific skills listed.</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="pro-card" id="reviewSection">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold m-0">Reviews & Feedback</h5>
+                    {% if user.is_authenticated and user.profile.pk != talent.pk %}
+                        <button class="btn btn-outline-dark btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#reviewForm">
+                            + Write Review
+                        </button>
+                    {% endif %}
+                </div>
+
+                <div class="collapse mb-4" id="reviewForm">
+                    <div class="bg-light p-4 rounded border">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="fw-bold small">Rating</label>
+                                <select name="rating" class="form-select w-auto">
+                                    <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                                    <option value="4">⭐⭐⭐⭐ Good</option>
+                                    <option value="3">⭐⭐⭐ Average</option>
+                                    <option value="2">⭐⭐ Poor</option>
+                                    <option value="1">⭐ Terrible</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="fw-bold small">Your Comment</label>
+                                {{ form.comment }}
+                            </div>
+                            <button type="submit" class="btn btn-dark btn-sm px-4">Post Review</button>
+                        </form>
+                    </div>
+                </div>
+
+                {% for review in reviews %}
+                <div class="review-box">
+                    <div class="d-flex mb-2">
+                        <div class="review-avatar me-3">
+                            {{ review.author.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <h6 class="fw-bold m-0">{{ review.author.username }}</h6>
+                            <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <div class="ms-auto text-warning">
+                            {% with ''|center:review.rating as range %}
+                            {% for _ in range %}
+                                <i class="fas fa-star"></i>
+                            {% endfor %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <p class="text-muted mb-0 ms-5 ps-2">{{ review.comment }}</p>
+                </div>
+                {% empty %}
+                <div class="text-center py-5">
+                    <div class="mb-3 text-muted opacity-50"><i class="far fa-comment-dots fa-3x"></i></div>
+                    <h6 class="text-muted">No reviews yet</h6>
+                </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% if user.profile.pk == talent.pk %}
+    <a href="{% url 'profile_update' %}" class="mobile-edit-fab" title="Edit Profile">
+        <i class="fas fa-pen"></i>
+    </a>
+{% endif %}
+
+<script>
+    // Auto-style the Django comment box
+    document.addEventListener("DOMContentLoaded", function() {
+        var comments = document.querySelector('textarea');
+        if(comments) {
+            comments.classList.add('form-control');
+            comments.rows = 3;
+            comments.placeholder = "Share your experience working with this talent...";
+        }
+    });
+</script>
+
+{% endblock %}
