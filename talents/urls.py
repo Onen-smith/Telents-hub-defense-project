@@ -1,27 +1,33 @@
 from django.urls import path
-from django.contrib.auth import views as auth_views # Import this
 from . import views
-from .views import ProfileDetailView, profile_update
-from .views import dashboard
 
 urlpatterns = [
+    # Core Pages
     path('', views.home, name='home'),
-    path('profile/<int:pk>/', views.profile_detail, name='profile_detail'),
+    path('browse/', views.browse, name='browse'),
     
-    # Auth Routes
+    # Authentication
     path('register/', views.register, name='register'),
-    path('login/', auth_views.LoginView.as_view(template_name='talents/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(template_name='talents/logout.html'), name='logout'),
-    path('profile/edit/', views.profile_update, name='profile_update'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    
+    
+    # Dashboard & Profile
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('profile/update/', views.profile_update, name='profile_update'),
+    
+    # This is the line that fixed the error (It uses views.profile_detail now)
+    path('profile/<int:pk>/', views.profile_detail, name='profile_detail'),
+
+    # Communication
+    path('contact/', views.contact, name='contact'),
+    path('subscribe/', views.subscribe, name='subscribe'),
+    path('notifications/read/', views.mark_notifications_read, name='mark_notifications_read'),
+
+    # Static Pages
     path('about/', views.about, name='about'),
     path('careers/', views.careers, name='careers'),
     path('blog/', views.blog, name='blog'),
-    path('contact/', views.contact, name='contact'),
-    path('privacy/', views.privacy, name='privacy'),
-    path('subscribe/', views.subscribe, name='subscribe'),
-    path('browse/', views.browse, name='browse'),
     path('blog/<int:pk>/', views.blog_detail, name='blog_detail'),
-    path('notifications/read/', views.mark_notifications_read, name='mark_notifications_read'),
-    path('profile/<int:pk>/', ProfileDetailView.as_view(), name='profile_detail'),
-    path('dashboard/', dashboard, name='dashboard'),
+    path('privacy/', views.privacy, name='privacy'),
 ]
