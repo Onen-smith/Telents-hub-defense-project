@@ -146,17 +146,17 @@ def register(request):
             login(request, user)
 
             # 2. SEND WELCOME EMAIL (Safely)
-            try:
-                subject = 'Welcome to TalentHub!'
-                message = f'Hi {user.username}, thanks for joining. We are excited to see your talents!'
-                email_from = settings.DEFAULT_FROM_EMAIL
-                recipient_list = [user.email, ]
+            # try:
+            #     subject = 'Welcome to TalentHub!'
+            #     message = f'Hi {user.username}, thanks for joining. We are excited to see your talents!'
+            #     email_from = settings.DEFAULT_FROM_EMAIL
+            #     recipient_list = [user.email, ]
                 
-                send_mail(subject, message, email_from, recipient_list)
-            except Exception as e:
-                # If email fails (e.g., bad internet), don't crash the site.
-                # Just log the error silently and move on.
-                print(f"Email failed: {e}")
+            #     send_mail(subject, message, email_from, recipient_list)
+            # except Exception as e:
+            #     # If email fails (e.g., bad internet), don't crash the site.
+            #     # Just log the error silently and move on.
+            #     print(f"Email failed: {e}")
 
             messages.success(request, f"Welcome, {user.username}! Your account is ready.")
             return redirect('dashboard') # Redirects straight to dashboard

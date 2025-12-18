@@ -1,9 +1,22 @@
-Django==5.0
-Pillow>=10.0.0
-python-decouple
-dj-database-url
-psycopg2-binary
-whitenoise
-gunicorn
-cloudinary
-django-cloudinary-storage
+# --- Core Django ---
+Django==4.2
+gunicorn==23.0.0
+whitenoise==6.11.0
+
+# --- Database (PostgreSQL) ---
+dj-database-url==3.0.1
+psycopg2-binary==2.9.11
+
+# --- Images & Storage ---
+cloudinary==1.44.1
+django-cloudinary-storage==0.3.0
+Pillow==12.0.0
+
+# --- Environment Variables ---
+python-decouple==3.8
+
+# --- Utilities (Optional but likely used) ---
+django-crispy-forms==2.5
+crispy-bootstrap5==2025.6
+requests==2.32.5
+Faker==38.2.0
