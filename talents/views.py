@@ -36,6 +36,11 @@ from .forms import (
     ReviewForm,
 )
 
+from django.contrib.auth import login  # For auto-login
+from django.core.mail import send_mail # For sending email
+from django.conf import settings #To get your email address
+from .forms import CustomUserCreationForm
+
 # --- CORE PAGES ---
 
 def home(request):
@@ -57,7 +62,7 @@ def browse(request):
     The main directory page with Search and Filtering.
     """
     # 1. Get all profiles initially
-    talents = Profile.objects.all()
+    talents = Profile.objects.all().order_by('-id')
     skills = Skill.objects.all() # For the filter sidebar
 
     # 2. Search by Name, Bio, or Skill Name (Global Search)
@@ -133,21 +138,33 @@ def profile_detail(request, pk):
 
 def register(request):
     if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
+        form = CustomUserCreationForm(request.POST) 
         if form.is_valid():
-            # 1. Save the User
             user = form.save()
-            
-            # 2. AUTOMATICALLY Create a Profile for them
-            Profile.objects.create(user=user)
-            
-            messages.success(request, "Account created! You can now login.")
-            return redirect('login')
-    else:
-        form = UserRegisterForm()
-    
-    return render(request, 'talents/register.html', {'form': form})
 
+            # 1. AUTO-LOGIN THE USER (Professional Option B)
+            login(request, user)
+
+            # 2. SEND WELCOME EMAIL (Safely)
+            try:
+                subject = 'Welcome to TalentHub!'
+                message = f'Hi {user.username}, thanks for joining. We are excited to see your talents!'
+                email_from = settings.DEFAULT_FROM_EMAIL
+                recipient_list = [user.email, ]
+                
+                send_mail(subject, message, email_from, recipient_list)
+            except Exception as e:
+                # If email fails (e.g., bad internet), don't crash the site.
+                # Just log the error silently and move on.
+                print(f"Email failed: {e}")
+
+            messages.success(request, f"Welcome, {user.username}! Your account is ready.")
+            return redirect('dashboard') # Redirects straight to dashboard
+
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, 'talents/register.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
@@ -172,7 +189,7 @@ def login_view(request):
 
 @login_required
 def dashboard(request):
-    profile = request.user.profile
+    profile, created = Profile.objects.get_or_create(user=request.user)
     
     # 1. Calculate Profile Completeness (Gamification)
     completeness = 0
@@ -325,5 +342,18 @@ def privacy(request):
 
 def logout_view(request):
     auth_logout(request)
-    messages.success(request, "You have been logged out.")
     return redirect('login')
+
+@login_required
+def all_notifications(request):
+    """Displays a full list of all notifications for the user."""
+    # Get all notifications, newest first
+    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+    
+    # Optional: Mark them all as read when the user views this page
+    notifications.update(is_read=True) 
+
+    context = {
+        'notifications': notifications
+    }
+    return render(request, 'talents/notifications.html', context)

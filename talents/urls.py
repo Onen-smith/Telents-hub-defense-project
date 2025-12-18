@@ -23,6 +23,7 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
     path('subscribe/', views.subscribe, name='subscribe'),
     path('notifications/read/', views.mark_notifications_read, name='mark_notifications_read'),
+    path('notifications/all/', views.all_notifications, name='all_notifications'),
 
     # Static Pages
     path('about/', views.about, name='about'),

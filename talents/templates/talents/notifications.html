@@ -1,0 +1,130 @@
+{% extends 'talents/base.html' %}
+
+{% block content %}
+<style>
+    /* Custom Animations & Styles for Notifications */
+    .notif-card {
+        border: none;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        background: #fff;
+        margin-bottom: 15px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .notif-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    }
+
+    /* Unread Styling: Purple border + light background */
+    .notif-card.unread {
+        background: #f8f9fe; /* Very light blue/purple tint */
+        border-left: 5px solid #667eea;
+    }
+
+    /* Read Styling: Simple gray border */
+    .notif-card.read {
+        border-left: 5px solid #e2e8f0;
+        opacity: 0.85; /* Slightly faded to show it is "done" */
+    }
+
+    .notif-icon-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .empty-state-icon {
+        width: 80px;
+        height: 80px;
+        background: #f3f4f6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: #9ca3af;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark mb-0">Notifications</h2>
+                    <p class="text-muted small mb-0">Stay updated with your latest activity</p>
+                </div>
+                <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm text-muted">
+                    <i class="fas fa-check-double me-2"></i>Mark all read
+                </button>
+            </div>
+
+            <div class="notification-list">
+                {% for notification in notifications %}
+                    <div class="card notif-card shadow-sm p-3 {% if not notification.is_read %}unread{% else %}read{% endif %}">
+                        <div class="d-flex align-items-center">
+                            
+                            <div class="notif-icon-box me-3 
+                                {% if 'Application' in notification.message %}bg-success bg-opacity-10 text-success
+                                {% elif 'subscribed' in notification.message %}bg-primary bg-opacity-10 text-primary
+                                {% else %}bg-warning bg-opacity-10 text-warning{% endif %}">
+                                
+                                {% if 'Application' in notification.message %}
+                                    <i class="fas fa-briefcase fa-lg"></i>
+                                {% elif 'subscribed' in notification.message %}
+                                    <i class="fas fa-envelope fa-lg"></i>
+                                {% else %}
+                                    <i class="fas fa-bell fa-lg"></i>
+                                {% endif %}
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h6 class="mb-1 text-dark fw-bold">
+                                        {% if 'Application' in notification.message %}New Job Application
+                                        {% elif 'subscribed' in notification.message %}Newsletter Update
+                                        {% else %}System Alert{% endif %}
+                                    </h6>
+                                    <small class="text-muted" style="font-size: 0.75rem;">
+                                        {{ notification.created_at|timesince }} ago
+                                    </small>
+                                </div>
+                                <p class="mb-0 text-secondary small" style="line-height: 1.5;">
+                                    {{ notification.message }}
+                                </p>
+                            </div>
+
+                            {% if not notification.is_read %}
+                                <div class="ms-3">
+                                    <span class="d-inline-block bg-danger rounded-circle shadow-sm" style="width: 10px; height: 10px;"></span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                {% empty %}
+                    <div class="text-center py-5">
+                        <div class="empty-state-icon shadow-sm">
+                            <i class="far fa-bell-slash fa-2x"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark">No notifications yet</h5>
+                        <p class="text-muted small">When you get job offers or updates, they will appear here.</p>
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary rounded-pill px-4 mt-2">
+                            Go to Dashboard
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
