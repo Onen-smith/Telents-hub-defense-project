@@ -1,0 +1,51 @@
+{% extends 'talents/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 500px;">
+    <div class="card shadow border-0 rounded-4">
+        <div class="card-body text-center p-5">
+            <h3 class="fw-bold mb-3">Confirm Deposit</h3>
+            <p class="text-muted">You are about to add funds to your wallet.</p>
+            
+            <h1 class="display-4 fw-bold text-primary my-4">₦{{ transaction.amount|intcomma }}</h1>
+            
+            <div class="alert alert-info small">
+                Reference: {{ transaction.reference }}
+            </div>
+
+            <button onclick="payWithPaystack()" class="btn btn-success btn-lg w-100 rounded-pill py-3 fw-bold">
+                <i class="fas fa-lock me-2"></i> Pay Now Securely
+            </button>
+            
+            <div class="mt-3">
+                <a href="{% url 'wallet' %}" class="text-decoration-none text-muted small">Cancel Transaction</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+    function payWithPaystack() {
+        var handler = PaystackPop.setup({
+            key: '{{ paystack_public_key }}', // From views.py
+            email: '{{ email }}',
+            amount: {{ amount_value }}, // Amount in Kobo
+            currency: 'NGN',
+            ref: '{{ transaction.reference }}', // Unique Reference
+            
+            callback: function(response) {
+                // This happens after payment is successful
+                // We will redirect to a verify view (Step 4)
+                window.location.href = "{% url 'verify_payment' transaction.reference %}";
+            },
+            
+            onClose: function() {
+                alert('Transaction was not completed, window closed.');
+            }
+        });
+        handler.openIframe();
+    }
+</script>
+{% endblock %}

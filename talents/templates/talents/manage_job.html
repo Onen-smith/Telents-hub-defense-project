@@ -1,0 +1,170 @@
+{% extends 'talents/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    /* PAGE HEADER */
+    .manage-header {
+        background: var(--bg-body);
+        border-bottom: 1px solid var(--border-color);
+        padding: 40px 0;
+    }
+
+    /* PROPOSAL CARD */
+    .proposal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 20px;
+        transition: all 0.2s;
+    }
+    .proposal-card:hover {
+        border-color: var(--accent);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+    
+    .avatar-box {
+        width: 50px; height: 50px; border-radius: 12px; object-fit: cover;
+    }
+
+    /* Cover Letter Box */
+    .cover-letter-box {
+        background: var(--bg-body);
+        border-radius: 12px;
+        padding: 15px;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        margin-top: 15px;
+        border: 1px solid var(--border-color);
+        line-height: 1.6;
+    }
+</style>
+
+<div class="manage-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <a href="{% url 'my_jobs' %}" class="text-decoration-none small fw-bold text-muted mb-2 d-block">
+                    <i class="fas fa-arrow-left me-1"></i> Back to My Jobs
+                </a>
+                <h2 class="fw-bold mb-1" style="color: var(--text-main)">{{ job.title }}</h2>
+                <div class="d-flex align-items-center gap-3 text-muted small">
+                    <span><i class="far fa-clock me-1"></i> Posted {{ job.created_at|date:"M d, Y" }}</span>
+                    <span><i class="fas fa-wallet me-1"></i> Budget: ${{ job.budget }}</span>
+                    
+                    {% if job.is_active %}
+                        <span class="badge bg-success bg-opacity-10 text-success">Recruiting</span>
+                    {% else %}
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary">Closed</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="text-end d-none d-md-block">
+                <div class="h2 fw-bold mb-0" style="color: var(--text-main)">{{ proposals.count }}</div>
+                <div class="small text-muted text-uppercase fw-bold">Proposals</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <h5 class="fw-bold mb-4" style="color: var(--text-main)">Review Proposals</h5>
+            
+            {% for prop in proposals %}
+            <div class="proposal-card">
+                
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex">
+                        <img src="{{ prop.freelancer.profile.profile_pic.url }}" class="avatar-box me-3">
+                        <div>
+                            <h5 class="fw-bold mb-0">
+                                <a href="{% url 'profile_detail' prop.freelancer.profile.slug %}" class="text-decoration-none" style="color: var(--text-main)">
+                                    {{ prop.freelancer.first_name }} {{ prop.freelancer.last_name }}
+                                </a>
+                            </h5>
+                            <div class="small text-primary">{{ prop.freelancer.profile.headline|default:"Freelancer" }}</div>
+                            <div class="mt-1">
+                                <i class="fas fa-star text-warning small"></i>
+                                <small class="text-muted fw-bold">New Talent</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-end">
+                        <div class="fw-bold fs-5 text-success">${{ prop.bid_amount }}</div>
+                        <small class="text-muted">{{ prop.estimated_days }} Days Delivery</small>
+                    </div>
+                </div>
+
+                <div class="cover-letter-box">
+                    <strong class="d-block mb-1" style="color: var(--text-main)">Cover Letter:</strong>
+                    {{ prop.cover_letter|linebreaks }}
+                </div>
+
+                <div class="mt-3 d-flex justify-content-end align-items-center gap-3 pt-3 border-top" style="border-color: var(--border-color)!important;">
+                    
+                    {% if prop.status == 'accepted' %}
+                        <span class="badge bg-success px-3 py-2 fs-6 me-2">Hired</span>
+                        <a href="{% url 'contract_detail' prop.contract.id %}" class="btn btn-sm btn-outline-success rounded-pill fw-bold">
+                            View Contract
+                        </a>
+                    {% else %}
+                        <button class="btn btn-sm btn-outline-dark rounded-pill fw-bold" onclick="alert('Messaging coming soon!')">
+                            <i class="far fa-comment-alt me-1"></i> Message
+                        </button>
+                        
+                        {% if job.is_active %}
+                            <a href="{% url 'create_contract' prop.id %}" class="btn btn-sm btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                                Hire Freelancer
+                            </a>
+                        {% else %}
+                            <button class="btn btn-sm btn-light border rounded-pill px-3" disabled>Job Closed</button>
+                        {% endif %}
+                    {% endif %}
+                    
+                </div>
+            </div>
+            {% empty %}
+                <div class="text-center py-5 border rounded-3 bg-light">
+                    <i class="far fa-file-alt fa-3x text-muted opacity-25 mb-3"></i>
+                    <h5 class="fw-bold" style="color: var(--text-main)">No proposals yet.</h5>
+                    <p class="text-muted">Wait for freelancers to apply.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card p-4 border-0 shadow-sm" style="background: var(--card-bg); border: 1px solid var(--border-color)!important;">
+                <h6 class="fw-bold text-uppercase text-muted small mb-4">Job Actions</h6>
+                
+                <a href="{% url 'job_detail' job.slug %}" class="btn btn-outline-primary w-100 rounded-pill mb-3 fw-bold">
+                    View Public Job Post
+                </a>
+                
+                {% if job.is_active %}
+                    <button class="btn btn-outline-danger w-100 rounded-pill fw-bold" onclick="alert('This will close the job without hiring.')">
+                        Close Job Post
+                    </button>
+                {% else %}
+                     <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>
+                        Job is Closed
+                    </button>
+                {% endif %}
+
+                <hr class="my-4" style="border-color: var(--border-color);">
+
+                <div class="small text-muted">
+                    <p class="mb-2"><i class="fas fa-eye me-2"></i> <strong>{{ job.views|default:"0" }}</strong> Views</p>
+                    <p class="mb-0"><i class="fas fa-check-circle me-2"></i> <strong>Status:</strong> {{ job.is_active|yesno:"Recruiting,Closed" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

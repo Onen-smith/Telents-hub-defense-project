@@ -1,314 +1,224 @@
 {% extends 'talents/base.html' %}
+{% load static %}
 
 {% block content %}
 
 <style>
-    /* 1. HERO HEADER (The Dark Banner or Custom Image) */
-    .profile-cover {
-        height: 220px;
-        /* Default fallback background if no image */
-        background-color: #1f2937; 
-        border-radius: 0 0 20px 20px;
-        position: relative;
-        margin-bottom: 90px; /* Space for the overlapping avatar */
-        background-size: cover;
-        background-position: center;
+    /* --- 2026 THEME VARIABLES --- */
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.85);
+        --glass-border: 1px solid rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 40px 80px -12px rgba(0, 0, 0, 0.15);
+        --radius-lg: 24px;
     }
 
-    /* 2. OVERLAPPING AVATAR */
-    .profile-avatar-large {
-        width: 170px;
-        height: 170px;
-        border-radius: 15px; /* Square with soft corners */
-        border: 5px solid white;
+    [data-theme="dark"] {
+        --glass-bg: rgba(21, 32, 43, 0.85);
+        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+        --shadow-xl: 0 40px 80px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    /* HEADER HERO */
+    .profile-cover {
+        height: 300px;
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        position: relative;
+        margin-bottom: 80px;
+    }
+    .profile-pattern {
+        position: absolute; width: 100%; height: 100%; opacity: 0.1;
+        background-image: radial-gradient(#fff 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    /* GLASS CARD STYLE */
+    .glass-card {
+        background: var(--glass-bg);
+        border: var(--glass-border);
+        box-shadow: var(--shadow-xl);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+
+    /* AVATAR */
+    .profile-avatar-lg {
+        width: 160px; height: 160px;
+        border-radius: 50%;
+        border: 6px solid var(--bg-body); /* Matches body color for cutout effect */
         object-fit: cover;
         position: absolute;
-        bottom: -70px; /* Pushes it half out of the banner */
-        left: 50px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-        background: white;
+        bottom: -80px; left: 50px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
-    /* 3. CARD STYLING */
-    .pro-card {
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 30px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-    }
-
-    /* 4. SKILL BADGES */
+    /* BADGES */
     .skill-badge {
-        background-color: #f3f4f6;
-        color: #374151;
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        display: inline-block;
-        margin: 0 6px 10px 0;
-        border: 1px solid #e5e7eb;
+        background: var(--accent); color: white;
+        padding: 8px 16px; border-radius: 30px;
+        font-size: 0.8rem; font-weight: 700;
+        display: inline-block; margin: 0 5px 8px 0;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-
-    /* 5. REVIEWS */
-    .review-box {
-        border-bottom: 1px solid #f3f4f6;
-        padding-bottom: 25px;
-        margin-bottom: 25px;
-    }
-    .review-box:last-child { border-bottom: none; }
     
-    .review-avatar {
-        width: 45px; height: 45px;
-        background: #e5e7eb;
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-weight: bold; color: #6b7280;
-        font-size: 1.1rem;
-    }
-
-    /* 6. MOBILE FLOATING EDIT BUTTON (New Addition) */
-    .mobile-edit-fab {
-        display: none; /* Hidden on desktop */
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        width: 60px;
-        height: 60px;
-        background: #111; /* Black Button */
-        color: white;
-        border-radius: 50%;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        z-index: 1000;
-        text-decoration: none;
-        transition: transform 0.2s;
-    }
-    .mobile-edit-fab:active { transform: scale(0.9); }
-
-    /* RESPONSIVE TWEAKS */
-    @media (max-width: 768px) {
-        /* Hide the normal edit button on mobile */
-        .desktop-edit-btn { display: none !important; }
-        
-        /* Show the floating button on mobile */
-        .mobile-edit-fab { display: flex; }
-
-        /* Center avatar on mobile */
-        .profile-avatar-large {
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: -50px;
-            width: 140px; height: 140px;
-        }
-        .profile-cover { margin-bottom: 70px; height: 180px; }
-        
-        /* Center text on mobile */
-        .pro-card.pt-4 { text-align: center; }
-        .pro-card.pt-4 hr { margin-left: auto; margin-right: auto; width: 50%; }
-        .d-flex.align-items-center { justify-content: center; } /* Center icons/text */
+    /* REVIEWS */
+    .review-item { border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px; }
+    .review-item:last-child { border-bottom: none; margin-bottom: 0; }
+    
+    @media (max-width: 991px) {
+        .profile-avatar-lg { left: 50%; transform: translateX(-50%); }
+        .profile-header-content { text-align: center; margin-top: 90px; }
+        .action-btns { justify-content: center; }
     }
 </style>
 
-<div class="container px-0">
-    <div class="profile-cover" 
-         style="{% if talent.cover_photo %}background-image: url('{{ talent.cover_photo.url }}');{% else %}background: linear-gradient(135deg, #1f2937 0%, #111827 100%);{% endif %}">
-        
-        <a href="{% url 'home' %}" class="btn btn-sm btn-light bg-white bg-opacity-25 border-0 text-white position-absolute top-0 start-0 m-4">
-            <i class="fas fa-arrow-left me-2"></i>Back to Directory
+<div class="profile-cover">
+    <div class="profile-pattern"></div>
+    <div class="container h-100 position-relative">
+        <a href="{% url 'dashboard' %}" class="btn btn-sm btn-light bg-white bg-opacity-10 border-0 text-white position-absolute top-0 start-0 m-4 z-2 backdrop-blur">
+            <i class="fas fa-arrow-left me-2"></i> Dashboard
         </a>
 
-        <img src="{{ talent.profile_pic.url }}" class="profile-avatar-large">
-        
-        <div class="position-absolute bottom-0 end-0 m-4 d-none d-md-block">
-            {% if user.is_authenticated and user.profile.pk != talent.pk %}
-              <button onclick="startChat('{{ profile.user.first_name }}', '{{ profile.user.email }}')" 
-        class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm">
-    <i class="fas fa-envelope me-2"></i> Contact Me
-</button>
-<a href="https://wa.me/{{ profile.phone_number }}" target="_blank" class="btn btn-success btn-lg rounded-pill px-4 fw-bold shadow-sm">
-    <i class="fab fa-whatsapp me-2"></i> WhatsApp
-</a>
-            {% endif %}
-            
-            {% if user.profile.pk == talent.pk %}
-                 <a href="{% url 'profile_update' %}" class="btn btn-primary fw-bold shadow-sm desktop-edit-btn">
-                    <i class="fas fa-pen me-2"></i>Edit Profile
-                </a>
-            {% endif %}
-        </div>
+        <img src="{{ profile.profile_pic.url|default:'https://ui-avatars.com/api/?name='|add:profile.user.username }}" class="profile-avatar-lg">
     </div>
 </div>
 
 <div class="container pb-5">
     <div class="row">
-        
-        <div class="col-lg-4">
-            <div class="pro-card pt-4"> 
-                <h2 class="fw-bold mb-1">
-                    {{ talent.user.first_name }} {{ talent.user.last_name }}
-                    {% if talent.is_verified %}
-                        <i class="fas fa-check-circle text-primary" title="Verified" style="font-size: 0.6em; vertical-align: middle;"></i>
-                    {% endif %}
-                </h2>
-                {% if not talent.user.first_name %}
-                    <h4 class="fw-bold mb-1">@{{ talent.user.username }}</h4>
-                {% endif %}
-
-                <p class="text-primary fw-bold mb-4">
-                    {% for skill in talent.skills.all|slice:":1" %}{{ skill.name }}{% empty %}Talent{% endfor %}
-                </p>
-                
-                <hr class="text-muted opacity-25">
-
-                <div class="mt-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="fas fa-map-marker-alt text-muted me-3 fa-lg" style="width:20px;"></i>
-                        <div>
-                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">Location</small>
-                            <span class="fw-bold">{{ talent.location|default:"Not set" }}</span>
-                        </div>
-                    </div>
-
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="fas fa-wallet text-muted me-3 fa-lg" style="width:20px;"></i>
-                        <div>
-                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">Hourly Rate</small>
-                            <span class="fw-bold">${{ talent.hourly_rate|default:"Negotiable" }}/hr</span>
-                        </div>
-                    </div>
-
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-star text-warning me-3 fa-lg" style="width:20px;"></i>
-                        <div>
-                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">Rating</small>
-                            <span class="fw-bold">
-                                {% if avg_rating %}{{ avg_rating|floatformat:1 }} / 5.0{% else %}New Talent{% endif %}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="col-lg-8">
             
-            <div class="pro-card">
-                <h5 class="fw-bold mb-3 border-bottom pb-3">About</h5>
-                <p class="text-muted mb-5" style="line-height: 1.8; font-size: 1.05rem;">
-                    {{ talent.bio|default:"No bio provided yet."|linebreaks }}
+            <div class="mb-5 profile-header-content" style="padding-left: 170px; min-height: 100px;">
+                <div class="d-none d-lg-block"> </div>
+                <h1 class="fw-bold mb-1">{{ profile.user.first_name }} {{ profile.user.last_name }} 
+                    {% if profile.is_verified %}<i class="fas fa-check-circle text-primary fs-5" title="Verified"></i>{% endif %}
+                </h1>
+                <p class="text-primary fw-bold fs-5 mb-2">{{ profile.headline|default:"Freelancer" }}</p>
+                <div class="d-flex align-items-center gap-3 text-muted mb-4 action-btns">
+                    <span><i class="fas fa-map-marker-alt me-1"></i> {{ profile.location }}</span>
+                    <span><i class="fas fa-star text-warning me-1"></i> {{ avg_rating }} ({{ review_count }})</span>
+                </div>
+                
+                <div class="d-flex gap-3 action-btns">
+                    {% if request.user == profile.user %}
+                        <a href="{% url 'profile_update' %}" class="btn btn-outline-dark rounded-pill px-4 fw-bold">Edit Profile</a>
+                    {% else %}
+                        <button class="btn btn-primary rounded-pill px-5 fw-bold shadow-lg">Hire Me</button>
+                        <button class="btn btn-light border rounded-circle" style="width:45px; height:45px;"><i class="far fa-envelope"></i></button>
+                    {% endif %}
+                    <a href="{% url 'chat_detail' profile.user.username %}" class="btn btn-outline-primary rounded-pill px-4">
+    <i class="far fa-comment-alt me-2"></i> Message
+</a>
+                </div>
+            </div>
+
+            <div class="glass-card p-5 mb-4">
+                <h4 class="fw-bold mb-4">About Me</h4>
+                <p class="text-muted" style="line-height: 1.8; font-size: 1.05rem;">
+                    {{ profile.bio|default:"No bio added yet."|linebreaks }}
                 </p>
 
-                <h5 class="fw-bold mb-3 border-bottom pb-3">Skills</h5>
+                {% if profile.project_link %}
+                <div class="p-3 rounded-4 border mt-4 d-flex align-items-center bg-light">
+                    <div class="me-3 p-3 bg-white rounded-3 shadow-sm text-primary"><i class="fas fa-rocket fa-2x"></i></div>
+                    <div>
+                        <small class="text-muted fw-bold text-uppercase">Featured Project</small>
+                        <a href="{{ profile.project_link }}" target="_blank" class="d-block fw-bold text-dark text-decoration-none">
+                            {{ profile.project_link|truncatechars:40 }} <i class="fas fa-external-link-alt ms-1 small"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="glass-card p-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold mb-0">Reviews</h4>
+                    <span class="badge bg-light text-dark border">{{ review_count }}</span>
+                </div>
+
+                {% if user.is_authenticated and user != profile.user %}
+                    <div class="p-4 bg-light rounded-4 mb-5 border">
+                        <h6 class="fw-bold mb-3">Leave a Review</h6>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">{{ form.rating }}</div>
+                            <div class="mb-3">{{ form.comment }}</div>
+                            <button class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">Post Review</button>
+                        </form>
+                    </div>
+                {% endif %}
+
+                {% for review in reviews %}
+                    <div class="review-item">
+                        <div class="d-flex justify-content-between mb-2">
+                            <h6 class="fw-bold">{{ review.author.username }}</h6>
+                            <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <div class="text-warning small mb-2">
+                            {% with ''|center:review.rating as range %}{% for _ in range %}<i class="fas fa-star"></i>{% endfor %}{% endwith %}
+                        </div>
+                        <p class="text-muted mb-0">{{ review.comment }}</p>
+                    </div>
+                {% empty %}
+                    <div class="text-center py-5">
+                        <i class="far fa-comment-dots fa-3x text-muted opacity-25 mb-3"></i>
+                        <p class="text-muted">No reviews yet.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        <div class="col-lg-4 mt-5 mt-lg-0 pt-lg-5">
+            
+            <div class="glass-card p-4 mb-4">
+                <h6 class="fw-bold text-uppercase text-muted small mb-4">Overview</h6>
+                
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted"><i class="fas fa-dollar-sign w-25px"></i> Hourly Rate</span>
+                    <span class="fw-bold">${{ profile.hourly_rate|default:"0" }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted"><i class="fas fa-briefcase w-25px"></i> Experience</span>
+                    <span class="fw-bold">{{ profile.years_experience }} Years</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted"><i class="fas fa-clock w-25px"></i> Availability</span>
+                    <span class="text-success fw-bold">{{ profile.get_availability_display }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted"><i class="fas fa-language w-25px"></i> English</span>
+                    <span class="fw-bold">{{ profile.get_english_level_display }}</span>
+                </div>
+            </div>
+
+            <div class="glass-card p-4 mb-4">
+                <h6 class="fw-bold text-uppercase text-muted small mb-4">Skills</h6>
                 <div>
-                    {% for skill in talent.skills.all %}
+                    {% for skill in profile.skills.all %}
                         <span class="skill-badge">{{ skill.name }}</span>
                     {% empty %}
-                        <span class="text-muted fst-italic">No specific skills listed.</span>
+                        <span class="text-muted small">No skills listed.</span>
                     {% endfor %}
                 </div>
             </div>
 
-            <div class="pro-card" id="reviewSection">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold m-0">Reviews & Feedback</h5>
-                    {% if user.is_authenticated and user.profile.pk != talent.pk %}
-                        <button class="btn btn-outline-dark btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#reviewForm">
-                            + Write Review
-                        </button>
+            <div class="glass-card p-4">
+                <h6 class="fw-bold text-uppercase text-muted small mb-4">Tools & Tech</h6>
+                <div>
+                    {% if profile.tools %}
+                        {% for tool in profile.tools.split %}
+                            <span class="badge bg-light text-dark border me-1 mb-1">{{ tool }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-muted small">No tools listed.</span>
                     {% endif %}
                 </div>
-
-                <div class="collapse mb-4" id="reviewForm">
-                    <div class="bg-light p-4 rounded border">
-                        <form method="POST" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label class="fw-bold small">Rating</label>
-                                <select name="rating" class="form-select w-auto">
-                                    <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
-                                    <option value="4">⭐⭐⭐⭐ Good</option>
-                                    <option value="3">⭐⭐⭐ Average</option>
-                                    <option value="2">⭐⭐ Poor</option>
-                                    <option value="1">⭐ Terrible</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="fw-bold small">Your Comment</label>
-                                {{ form.comment }}
-                            </div>
-                            <button type="submit" class="btn btn-dark btn-sm px-4">Post Review</button>
-                        </form>
-                    </div>
-                </div>
-
-                {% for review in reviews %}
-                <div class="review-box">
-                    <div class="d-flex mb-2">
-                        <div class="review-avatar me-3">
-                            {{ review.author.username|slice:":1"|upper }}
-                        </div>
-                        <div>
-                            <h6 class="fw-bold m-0">{{ review.author.username }}</h6>
-                            <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
-                        </div>
-                        <div class="ms-auto text-warning">
-                            {% with ''|center:review.rating as range %}
-                            {% for _ in range %}
-                                <i class="fas fa-star"></i>
-                            {% endfor %}
-                            {% endwith %}
-                        </div>
-                    </div>
-                    <p class="text-muted mb-0 ms-5 ps-2">{{ review.comment }}</p>
-                </div>
-                {% empty %}
-                <div class="text-center py-5">
-                    <div class="mb-3 text-muted opacity-50"><i class="far fa-comment-dots fa-3x"></i></div>
-                    <h6 class="text-muted">No reviews yet</h6>
-                </div>
-                {% endfor %}
-
             </div>
 
         </div>
     </div>
 </div>
-
-{% if user.profile.pk == talent.pk %}
-    <a href="{% url 'profile_update' %}" class="mobile-edit-fab" title="Edit Profile">
-        <i class="fas fa-pen"></i>
-    </a>
-{% endif %}
-
-<script>
-    // Auto-style the Django comment box
-    document.addEventListener("DOMContentLoaded", function() {
-        var comments = document.querySelector('textarea');
-        if(comments) {
-            comments.classList.add('form-control');
-            comments.rows = 3;
-            comments.placeholder = "Share your experience working with this talent...";
-        }
-    });
-</script>
-<script>
-    function startChat(name, email) {
-        // 1. Ask the user for a message
-        let message = prompt("Send a message to " + name + " (" + email + "):", "Hi, I am interested in your services.");
-        
-        // 2. If they typed something and clicked OK
-        if (message != null && message.trim() !== "") {
-            // 3. Simulate sending delay (makes it look real)
-            setTimeout(function() {
-                alert("✅ Message sent successfully to " + name + "!\n\nThey will reply to your email shortly.");
-            }, 500);
-        }
-    }
-</script>
 
 {% endblock %}

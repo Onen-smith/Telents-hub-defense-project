@@ -1,16 +1,196 @@
 {% extends 'talents/base.html' %}
+{% load static %}
+
 {% block content %}
-<div class="container py-5">
-    <div class="row align-items-center">
-        <div class="col-lg-6">
-            <h6 class="text-primary fw-bold text-uppercase">About Us</h6>
-            <h1 class="display-4 fw-bold mb-4">Connecting Talent with Opportunity.</h1>
-            <p class="lead text-muted mb-4">TalentHub was born from a simple idea: skilled professionals deserve a platform that highlights their abilities, not just their job titles.</p>
-            <p class="text-muted">Founded in 2025, we verify every profile to ensure trust between talents and employers. Our mission is to reduce unemployment by making freelance hiring fast, secure, and transparent.</p>
+
+<style>
+    /* 1. HERO SECTION */
+    .about-hero {
+        background: radial-gradient(circle at bottom left, #111827 0%, #0f172a 100%);
+        color: white;
+        padding: 100px 0 150px; /* Extra padding bottom for overlap */
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* 2. STATS OVERLAP CARD */
+    .stats-container {
+        margin-top: -80px; /* Pulls it up into the hero */
+        position: relative;
+        z-index: 2;
+    }
+    .stats-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-around;
+        text-align: center;
+        flex-wrap: wrap;
+        gap: 30px;
+    }
+    
+    .stat-item h2 { font-weight: 800; font-size: 2.5rem; color: var(--accent); margin-bottom: 5px; }
+    .stat-item p { color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin: 0; }
+
+    /* 3. STORY SECTION */
+    .story-img {
+        width: 100%; height: 400px; object-fit: cover; border-radius: 20px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+    .story-content { padding-left: 20px; }
+
+    /* 4. TEAM GRID */
+    .team-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 30px;
+        text-align: center;
+        transition: transform 0.2s;
+    }
+    .team-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+    
+    .team-avatar {
+        width: 100px; height: 100px; border-radius: 50%;
+        object-fit: cover; margin-bottom: 20px;
+        border: 4px solid var(--bg-body);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    
+    .team-role {
+        font-size: 0.85rem; text-transform: uppercase; font-weight: 700;
+        color: var(--accent); margin-bottom: 10px; display: block;
+    }
+
+    /* 5. VALUES */
+    .value-box {
+        padding: 30px; border-left: 4px solid var(--border-color);
+        transition: all 0.2s;
+    }
+    .value-box:hover { border-left-color: var(--accent); background: var(--bg-body); }
+</style>
+
+<div class="about-hero text-center">
+    <div class="container">
+        <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 px-3 py-2 rounded-pill mb-4">
+            Our Mission
+        </span>
+        <h1 class="display-3 fw-bold mb-4">Bridging the Gap Between<br>Talent & Opportunity.</h1>
+        <p class="lead text-white-50 mx-auto" style="max-width: 700px;">
+            We are building the digital infrastructure that empowers African professionals to compete on the global stage, secure fair wages, and do their best work.
+        </p>
+    </div>
+</div>
+
+<div class="container stats-container">
+    <div class="stats-card">
+        <div class="stat-item">
+            <h2>2026</h2>
+            <p>Year Founded</p>
         </div>
-        <div class="col-lg-6">
-            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="img-fluid rounded-4 shadow-lg">
+        <div class="stat-item">
+            <h2>$12k+</h2>
+            <p>Paid to Freelancers</p>
+        </div>
+        <div class="stat-item">
+            <h2>500+</h2>
+            <p>Active Users</p>
+        </div>
+        <div class="stat-item">
+            <h2>100%</h2>
+            <p>Secure Payments</p>
         </div>
     </div>
 </div>
+
+<div class="container py-5 mt-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <div class="story-img bg-secondary d-flex align-items-center justify-content-center text-white">
+                <div><i class="fas fa-rocket fa-4x opacity-50"></i></div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="story-content">
+                <h5 class="text-primary fw-bold text-uppercase mb-2">Our Story</h5>
+                <h2 class="fw-bold display-6 mb-4" style="color: var(--text-main);">Why we started TalentHub</h2>
+                <p class="text-muted lead">
+                    For too long, skilled Nigerian professionals have faced barriers to entry in the global market—payment issues, trust deficits, and platform bias.
+                </p>
+                <p class="text-muted">
+                    TalentHub was born from a final year project with a simple goal: <strong>Create a localized yet world-class platform</strong> where trust is built-in. We use secure escrow payments and strict verification to ensure that when work is done, payment is guaranteed.
+                </p>
+                <div class="mt-4">
+                    <div class="value-box">
+                        <h5 class="fw-bold" style="color: var(--text-main);">Trust First</h5>
+                        <p class="text-muted small mb-0">We verify every user to eliminate scams.</p>
+                    </div>
+                    <div class="value-box">
+                        <h5 class="fw-bold" style="color: var(--text-main);">Speed</h5>
+                        <p class="text-muted small mb-0">Hire in minutes, not days.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="py-5" style="background: var(--bg-body);">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold display-6" style="color: var(--text-main);">Meet the Builders</h2>
+            <p class="text-muted">The team behind the code.</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-4 col-lg-3">
+                <div class="team-card">
+                    <div class="team-avatar mx-auto bg-dark d-flex align-items-center justify-content-center text-white h1">
+                        EO
+                    </div>
+                    <h5 class="fw-bold mb-1" style="color: var(--text-main);">Emmanuel Onen</h5>
+                    <span class="team-role">Lead Developer</span>
+                    <p class="text-muted small mt-3">Full-stack engineer passionate about solving local problems with global tech.</p>
+                    <div class="d-flex justify-content-center gap-2 mt-3">
+                        <a href="#" class="btn btn-sm btn-light rounded-circle border"><i class="fab fa-github"></i></a>
+                        <a href="#" class="btn btn-sm btn-light rounded-circle border"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-3">
+                <div class="team-card">
+                    <div class="team-avatar mx-auto bg-primary bg-opacity-25 d-flex align-items-center justify-content-center text-primary h1">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1" style="color: var(--text-main);">Dr. Supervisor</h5>
+                    <span class="team-role">Project Advisor</span>
+                    <p class="text-muted small mt-3">Provided guidance on system architecture and best practices.</p>
+                </div>
+            </div>
+
+             <div class="col-md-4 col-lg-3">
+                <div class="team-card">
+                    <div class="team-avatar mx-auto bg-success bg-opacity-25 d-flex align-items-center justify-content-center text-success h1">
+                        <i class="fas fa-pen-nib"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1" style="color: var(--text-main);">Design Team</h5>
+                    <span class="team-role">UI/UX</span>
+                    <p class="text-muted small mt-3">Focused on creating a clean, glassmorphic user experience.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="container py-5 text-center">
+    <h2 class="fw-bold mb-3" style="color: var(--text-main);">Ready to join the future?</h2>
+    <p class="text-muted mb-4">Create your account today and start your journey.</p>
+    <a href="{% url 'register' %}" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-lg">Get Started</a>
+</div>
+
 {% endblock %}

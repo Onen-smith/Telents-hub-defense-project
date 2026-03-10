@@ -1,211 +1,192 @@
 {% extends 'talents/base.html' %}
+{% load static %}
+{% load humanize %}
 
 {% block content %}
 
 <style>
-    body { background-color: #f8f9fa; }
-
-    /* 1. BROWSE HERO SECTION */
-    .browse-hero {
-        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-        padding: 60px 0;
-        margin-bottom: 40px;
-        border-radius: 0 0 20px 20px;
-        position: relative;
-        overflow: hidden;
+    /* --- PAGE HEADER --- */
+    .talent-header {
+        background: var(--bg-surface);
+        border-bottom: 1px solid var(--border);
+        padding: 50px 0;
+        text-align: center;
+        /* Different Gradient than Jobs Page (Teal/Cyan vs Purple) */
+        background-image: radial-gradient(circle at top, rgba(6, 182, 212, 0.15), transparent 60%);
     }
 
-    .search-container {
-        max-width: 700px;
-        margin: 0 auto;
-        position: relative;
+    /* Subtitle Visibility Fix */
+    .header-subtitle {
+        color: var(--text-main); opacity: 0.8; font-size: 1.1rem; margin-bottom: 30px;
     }
 
-    .browse-search-input {
-        width: 100%;
-        padding: 18px 30px;
-        padding-right: 120px;
+    /* Centered Search */
+    .search-pill {
+        background: var(--bg-body);
+        border: 1px solid var(--border);
         border-radius: 50px;
-        border: none;
-        font-size: 1.1rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        transition: transform 0.2s;
+        padding: 10px 25px;
+        display: inline-flex; align-items: center; width: 100%; max-width: 500px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     }
-    .browse-search-input:focus {
-        outline: none;
-        transform: scale(1.01);
+    .search-pill input {
+        border: none; background: transparent; color: var(--text-main);
+        flex: 1; outline: none; margin-left: 10px;
     }
 
-    .btn-search-submit {
-        position: absolute;
-        right: 8px;
-        top: 8px;
-        bottom: 8px;
-        border-radius: 40px;
-        padding: 0 30px;
-        background: #764ba2;
-        color: white;
-        border: none;
-        font-weight: 700;
-        transition: background 0.2s;
-    }
-    .btn-search-submit:hover { background: #6b4294; }
+    /* --- LAYOUT --- */
+    .browse-container { padding: 40px 0; }
 
-    /* 2. PREMIUM TALENT CARD */
-    .talent-card {
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
-        transition: all 0.3s ease;
-        overflow: hidden;
+    /* --- PROFILE CARD (VERTICAL GRID STYLE) --- */
+    .profile-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 30px 20px;
+        text-align: center;
+        transition: transform 0.2s, border-color 0.2s;
         height: 100%;
         position: relative;
-    }
-    
-    .talent-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 30px rgba(0,0,0,0.08);
-        border-color: transparent;
-    }
-    
-    .card-img-wrapper {
-        height: 220px;
         overflow: hidden;
-        position: relative;
+    }
+    .profile-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    /* Top Color Bar on Card */
+    .card-accent {
+        position: absolute; top: 0; left: 0; width: 100%; height: 6px;
+        background: linear-gradient(90deg, #06b6d4, #3b82f6);
+    }
+
+    /* Avatar */
+    .p-avatar {
+        width: 100px; height: 100px; border-radius: 50%;
+        object-fit: cover; border: 4px solid var(--bg-body);
+        margin: 0 auto 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+
+    /* Text Info */
+    .p-name { font-size: 1.2rem; font-weight: 700; color: var(--text-main); text-decoration: none; display: block; }
+    .p-title { color: var(--primary); font-size: 0.9rem; font-weight: 600; margin-bottom: 10px; min-height: 20px; }
+    
+    .p-rate { 
+        font-size: 1.1rem; font-weight: 800; color: var(--text-main); 
+        margin: 15px 0; padding: 8px; 
+        background: var(--bg-body); border-radius: 8px; display: inline-block;
     }
     
-    .card-img-top {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;  /* <--- ADD THIS LINE */
-    transition: transform 0.5s ease;
-}
-    
-    .talent-card:hover .card-img-top { transform: scale(1.05); }
-    
-    .card-body { padding: 25px; }
-    
-    .talent-name { 
-        font-weight: 800; font-size: 1.1rem; color: #111; text-decoration: none; display: block; margin-bottom: 5px;
+    .p-skills { min-height: 50px; margin-bottom: 20px; }
+    .skill-dot {
+        font-size: 0.75rem; background: rgba(255,255,255,0.05); 
+        border: 1px solid var(--border); color: var(--text-muted);
+        padding: 4px 10px; border-radius: 20px; margin: 2px; display: inline-block;
     }
-    .verified-badge { color: #1d9bf0; margin-left: 5px; font-size: 0.9em; }
-    
-    .talent-bio {
-        font-size: 0.9rem; color: #6b7280; margin-bottom: 15px;
-        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+
+    .btn-profile {
+        width: 100%; border-radius: 50px; font-weight: 700;
+        background: transparent; border: 1px solid var(--text-main);
+        color: var(--text-main); padding: 8px 0; transition: 0.2s;
+        display: block; text-decoration: none;
     }
-    
-    .skill-tag {
-        font-size: 0.75rem; background: #f3f4f6; color: #4b5563; padding: 4px 10px;
-        border-radius: 6px; margin-right: 5px; font-weight: 600; display: inline-block; margin-bottom: 5px;
+    .btn-profile:hover {
+        background: var(--text-main); color: var(--bg-body);
     }
-    
-    .card-footer-custom {
-        padding-top: 15px; border-top: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;
-    }
+
 </style>
 
-<section class="browse-hero">
-    <div class="container text-center">
-        <h2 class="text-white fw-bold mb-2">Find Your Perfect Talent</h2>
-        <p class="text-white-50 mb-4">Search by name, skill, or keyword.</p>
+<div class="talent-header">
+    <div class="container">
+        <h1 class="fw-bold display-6 mb-2" style="color: var(--text-main)">Discover Top Talent</h1>
+        <p class="header-subtitle">Connect with experts ready to work.</p>
         
-        <form method="GET" action="{% url 'browse' %}" class="search-container">
-            <input type="text" name="q" class="browse-search-input" placeholder="e.g. Graphic Designer, Python, Lagos..." value="{{ request.GET.q }}">
-            <button type="submit" class="btn-search-submit">Search</button>
+        <form method="get" class="search-pill">
+            <i class="fas fa-search text-muted"></i>
+            <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Try 'Python', 'Designer', or name...">
         </form>
-        
-        <div class="mt-4">
-            <small class="text-white-50 fw-bold me-2 text-uppercase">Popular:</small>
-            <a href="?q=Developer" class="badge bg-white bg-opacity-10 text-white text-decoration-none border border-secondary me-1">Developer</a>
-            <a href="?q=Designer" class="badge bg-white bg-opacity-10 text-white text-decoration-none border border-secondary me-1">Designer</a>
-            <a href="?q=Manager" class="badge bg-white bg-opacity-10 text-white text-decoration-none border border-secondary">Manager</a>
-        </div>
     </div>
-</section>
+</div>
 
-<div class="container pb-5">
+<div class="container browse-container">
     
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="fw-bold m-0 text-dark">
-            {% if request.GET.q %}
-                Results for "{{ request.GET.q }}"
-            {% else %}
-                All Talents
-            {% endif %}
-            <span class="text-muted small fw-normal ms-2">({{ talents.count }} found)</span>
-        </h5>
+        <h5 class="fw-bold mb-0" style="color: var(--text-main)">{{ profiles.count|default:"0" }} Experts Found</h5>
+        
+        <div class="dropdown">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle rounded-pill" type="button" data-bs-toggle="dropdown">
+                Filter by Skill
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" style="background: var(--bg-surface); border-color: var(--border);">
+                <li><a class="dropdown-item" href="?cat=dev">Developers</a></li>
+                <li><a class="dropdown-item" href="?cat=design">Designers</a></li>
+                <li><a class="dropdown-item" href="?cat=writing">Writers</a></li>
+                <li><hr class="dropdown-divider" style="border-color: var(--border);"></li>
+                <li><a class="dropdown-item" href="{% url 'browse' %}">Clear All</a></li>
+            </ul>
+        </div>
     </div>
 
-    <div class="row g-4">
-        {% for talent in talents %}
-        <div class="col-md-6 col-lg-4"> 
-            <div class="talent-card">
-                <div class="card-img-wrapper">
-                    <a href="{% url 'profile_detail' talent.pk %}">
-                        <img src="{{ talent.profile_pic.url }}" class="card-img-top">
-                    </a>
-                </div>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        {% for profile in profiles %}
+        <div class="col">
+            <div class="profile-card">
+                <div class="card-accent"></div>
                 
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <a href="{% url 'profile_detail' talent.pk %}" class="talent-name">
-                                {{ talent.user.first_name }} {{ talent.user.last_name }}
-                                {% if talent.is_verified %}
-                                    <i class="fas fa-check-circle verified-badge" title="Verified"></i>
-                                {% endif %}
-                            </a>
-                            {% if not talent.user.first_name %}
-                                <a href="{% url 'profile_detail' talent.pk %}" class="talent-name">@{{ talent.user.username }}</a>
-                            {% endif %}
-                            <small class="text-primary fw-bold" style="font-size: 0.8rem;">
-                                {{ talent.skills.first.name|default:"Talent" }}
-                            </small>
-                        </div>
-                    </div>
+                {% if profile.profile_pic %}
+                    <img src="{{ profile.profile_pic.url }}" class="p-avatar">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ profile.user.username }}&background=random&size=150" class="p-avatar">
+                {% endif %}
 
-                    <p class="talent-bio mt-3">
-                        {{ talent.bio|default:"Available for hire."|truncatewords:8 }}
-                    </p>
+                <a href="{% url 'profile_view' profile.user.username %}" class="p-name">{{ profile.user.first_name }} {{ profile.user.last_name }}</a>
+                <div class="p-title">{{ profile.title|default:"Freelancer" }}</div>
 
-                    <div class="mb-3">
-                        {% for skill in talent.skills.all|slice:":2" %}
-                            <span class="skill-tag">{{ skill.name }}</span>
-                        {% empty %}
-                            <span class="text-muted small">No skills</span>
-                        {% endfor %}
-                        {% if talent.skills.count > 2 %}
-                            <span class="text-muted small ms-1">+{{ talent.skills.count|add:"-2" }}</span>
-                        {% endif %}
-                    </div>
+                <div class="p-rate">${{ profile.hourly_rate|default:"--" }}<span style="font-size: 0.8rem; font-weight: normal; opacity: 0.7;">/hr</span></div>
 
-                    <div class="card-footer-custom">
-                        <div>
-                            <span class="fw-bold text-dark fs-5">
-                                {% if talent.hourly_rate %}
-                                    ${{ talent.hourly_rate }}
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </span>
-                            <small class="text-muted">/hr</small>
-                        </div>
-                        <a href="{% url 'profile_detail' talent.pk %}" class="btn btn-outline-dark rounded-pill px-4 fw-bold btn-sm">View Profile</a>
-                    </div>
+                <div class="p-skills">
+                    {% for skill in profile.skills.all|slice:":3" %}
+                        <span class="skill-dot">{{ skill.name }}</span>
+                    {% empty %}
+                        <span class="skill-dot">Available</span>
+                    {% endfor %}
+                    {% if profile.skills.count > 3 %}
+                        <span class="skill-dot">+{{ profile.skills.count|add:"-3" }}</span>
+                    {% endif %}
                 </div>
+
+                <a href="{% url 'profile_view' profile.user.username %}" class="btn-profile">View Profile</a>
             </div>
         </div>
         {% empty %}
-            <div class="col-12 text-center py-5">
-                <div class="mb-3 text-muted opacity-50"><i class="fas fa-search fa-4x"></i></div>
-                <h3>No talents found.</h3>
-                <p class="text-muted">Try using different keywords or clear your search.</p>
-                <a href="{% url 'browse' %}" class="btn btn-dark rounded-pill mt-3">Clear Search</a>
+        <div class="col-12 text-center py-5">
+            <div style="opacity: 0.5;">
+                <i class="fas fa-users-slash fa-3x mb-3" style="color: var(--text-main);"></i>
+                <h4 style="color: var(--text-main);">No talents found</h4>
+                <p style="color: var(--text-main);">Try a different search term.</p>
             </div>
+        </div>
         {% endfor %}
     </div>
+
+    {% if profiles.has_other_pages %}
+    <div class="d-flex justify-content-center mt-5">
+        <nav>
+            <ul class="pagination">
+                {% if profiles.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ profiles.previous_page_number }}" style="background: var(--bg-surface); border-color: var(--border); color: var(--text-main);">&laquo;</a></li>
+                {% endif %}
+                <li class="page-item active"><span class="page-link" style="background: var(--primary); border-color: var(--primary);">{{ profiles.number }}</span></li>
+                {% if profiles.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ profiles.next_page_number }}" style="background: var(--bg-surface); border-color: var(--border); color: var(--text-main);">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
 </div>
 
 {% endblock %}

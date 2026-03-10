@@ -1,0 +1,266 @@
+{% extends 'talents/base.html' %}
+{% load static %}
+{% load humanize %} {% block content %}
+
+<style>
+    /* --- 1. THE GLASS CREDIT CARD --- */
+    .wallet-section {
+        padding: 40px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .glass-card-wrapper {
+        perspective: 1000px;
+        max-width: 420px;
+        margin: 0 auto;
+    }
+
+    .virtual-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 24px;
+        padding: 30px;
+        color: white; /* Always white text on the card */
+        position: relative;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    
+    .virtual-card:hover { transform: translateY(-5px) rotateX(2deg); }
+
+    /* The Mesh Gradient Background for the Card */
+    .card-bg-mesh {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: radial-gradient(circle at top left, var(--primary), transparent 70%),
+                    radial-gradient(circle at bottom right, #06b6d4, transparent 70%);
+        opacity: 0.8; z-index: -1;
+    }
+
+    .card-chip {
+        width: 50px; height: 35px;
+        background: linear-gradient(135deg, #ffd700, #b8860b);
+        border-radius: 8px; margin-bottom: 25px;
+        position: relative;
+        opacity: 0.9;
+    }
+
+    .balance-label { font-size: 0.85rem; opacity: 0.8; letter-spacing: 1px; text-transform: uppercase; }
+    .balance-amount { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 20px; }
+    
+    .card-number { font-family: 'Courier New', monospace; font-size: 1.1rem; letter-spacing: 2px; opacity: 0.8; margin-bottom: 25px; }
+    
+    .card-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+    .card-holder { font-size: 0.9rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; }
+    .card-logo { font-size: 1.5rem; font-style: italic; font-weight: 800; opacity: 0.9; }
+
+    /* --- 2. STATS ROW --- */
+    .wallet-stat {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 16px; padding: 20px;
+        text-align: center; height: 100%;
+    }
+    .ws-label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 600; }
+    .ws-value { color: var(--text-main); font-size: 1.5rem; font-weight: 700; margin-top: 5px; }
+
+    /* --- 3. TRANSACTION LIST --- */
+    .trans-item {
+        background: var(--bg-surface);
+        border-bottom: 1px solid var(--border);
+        padding: 20px; display: flex; align-items: center; justify-content: space-between;
+        transition: background 0.2s;
+    }
+    .trans-item:first-child { border-top-left-radius: 16px; border-top-right-radius: 16px; }
+    .trans-item:last-child { border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; border-bottom: none; }
+    .trans-item:hover { background: rgba(139, 92, 246, 0.05); }
+
+    .t-icon {
+        width: 45px; height: 45px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem; margin-right: 15px;
+    }
+    .icon-in { background: rgba(16, 185, 129, 0.1); color: #10b981; } /* Green for money in */
+    .icon-out { background: rgba(239, 68, 68, 0.1); color: #ef4444; } /* Red for money out */
+    
+    .amount-in { color: #10b981; font-weight: 700; }
+    .amount-out { color: var(--text-main); font-weight: 600; }
+
+</style>
+
+<div class="container wallet-section">
+    
+    <div class="row g-5">
+        
+        <div class="col-lg-5">
+            <h3 class="fw-bold mb-4" style="color: var(--text-main)">My Wallet</h3>
+            
+            <div class="glass-card-wrapper mb-4">
+                <div class="virtual-card">
+                    <div class="card-bg-mesh"></div>
+                    <div class="card-chip"></div>
+                    
+                    <div class="balance-label">Total Balance</div>
+                    <div class="balance-amount">₦{{ balance|intcomma }}</div>
+                    
+                    <div class="card-number">**** **** **** 4829</div>
+                    
+                    <div class="card-footer">
+                        <div>
+                            <div class="balance-label" style="font-size: 0.6rem;">CARD HOLDER</div>
+                            <div class="card-holder">{{ user.first_name }} {{ user.last_name }}</div>
+                        </div>
+                        <div class="card-logo">VISA</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-3 d-md-flex justify-content-center mb-4">
+                <button type="button" class="btn btn-primary-glow btn-lg px-5 rounded-pill w-100" 
+        data-bs-toggle="modal" data-bs-target="#withdrawModal">
+    <i class="fas fa-arrow-down me-2"></i> Withdraw
+</button>
+                <button type="button" class="btn btn-outline-secondary btn-lg px-5 rounded-pill w-100 fw-bold" 
+        style="color: var(--text-main); border-color: var(--border);" 
+        data-bs-toggle="modal" data-bs-target="#depositModal">
+    <i class="fas fa-plus me-2"></i> Top Up
+</button>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="wallet-stat">
+                        <div class="ws-label">Pending Clearance</div>
+                        <div class="ws-value text-warning">₦0.00</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="wallet-stat">
+                        <div class="ws-label">Total Earnings</div>
+                        <div class="ws-value">₦{{ balance|intcomma }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0" style="color: var(--text-main)">Recent Transactions</h5>
+                <button class="btn btn-sm btn-link text-decoration-none" style="color: var(--primary)">Export CSV</button>
+            </div>
+
+            <div class="d-flex flex-column">
+                
+                {% for transaction in transactions %}
+                <div class="trans-item">
+                    <div class="d-flex align-items-center">
+                        
+                        {% if transaction.transaction_type == 'deposit' %}
+                            <div class="t-icon icon-in"><i class="fas fa-arrow-down"></i></div>
+                        {% elif transaction.transaction_type == 'withdrawal' %}
+                            <div class="t-icon icon-out"><i class="fas fa-university"></i></div>
+                        {% else %}
+                            <div class="t-icon" style="background: rgba(255,255,255,0.1); color: var(--text-muted);"><i class="fas fa-tag"></i></div>
+                        {% endif %}
+
+                        <div>
+                            <div class="fw-bold" style="color: var(--text-main)">{{ transaction.get_transaction_type_display }}</div>
+                            <div class="small" style="color: var(--text-muted)">
+                                {{ transaction.created_at|date:"M d, Y" }} 
+                                • 
+                                <span class="badge {% if transaction.status == 'success' %}bg-success{% else %}bg-warning{% endif %}" style="font-size: 0.6rem;">
+                                    {{ transaction.status|title }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if transaction.transaction_type == 'deposit' %}
+                        <div class="amount-in">+₦{{ transaction.amount|intcomma }}</div>
+                    {% else %}
+                        <div class="amount-out">-₦{{ transaction.amount|intcomma }}</div>
+                    {% endif %}
+                </div>
+                
+                {% empty %}
+                <div class="text-center py-5">
+                    <i class="fas fa-receipt mb-3" style="font-size: 2rem; opacity: 0.3;"></i>
+                    <p class="text-muted">No transactions found.</p>
+                </div>
+                {% endfor %}
+                </div>
+            
+            {% if transactions %}
+            <div class="text-center mt-4">
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-4" style="color: var(--text-muted); border-color: var(--border);">Load More</button>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+<div class="modal fade" id="depositModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card-wrapper" style="background: var(--bg-surface); border: 1px solid var(--border);">
+      
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold" style="color: var(--text-main)">Top Up Wallet</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="POST">
+          {% csrf_token %} <div class="modal-body">
+              <div class="mb-3">
+                  <label class="form-label text-muted small fw-bold">AMOUNT TO DEPOSIT (₦)</label>
+                  
+                  {{ deposit_form.amount }} 
+                  
+              </div>
+          </div>
+
+          <div class="modal-footer border-0">
+              <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancel</button>
+              
+              <button type="submit" name="deposit_btn" class="btn btn-primary-glow rounded-pill px-4">Confirm Deposit</button>
+          </div>
+      </form>
+      </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="withdrawModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card-wrapper" style="background: var(--bg-surface); border: 1px solid var(--border);">
+      
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold text-danger">Withdraw Funds</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="POST">
+          {% csrf_token %} <div class="modal-body">
+              <div class="alert alert-warning small">
+                  <i class="fas fa-info-circle me-1"></i> Funds will be sent to your bank account within 24 hours.
+              </div>
+              <div class="mb-3">
+                  <label class="form-label text-muted small fw-bold">AMOUNT TO WITHDRAW (₦)</label>
+                  
+                  {{ withdraw_form.amount }}
+                  
+              </div>
+          </div>
+
+          <div class="modal-footer border-0">
+              <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancel</button>
+              
+              <button type="submit" name="withdraw_btn" class="btn btn-danger rounded-pill px-4">Confirm Withdrawal</button>
+          </div>
+      </form>
+      </div>
+  </div>
+</div>
+{% endblock %}

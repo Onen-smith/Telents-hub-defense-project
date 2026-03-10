@@ -1,168 +1,502 @@
 {% extends 'talents/base.html' %}
+{% load static %}
+{% load humanize %}
 
 {% block content %}
 
 <style>
-    body { background-color: #f3f4f6; }
-    
-    /* DASHBOARD GRID */
-    .dash-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 25px;
+    /* 1. DEFAULT (LIGHT MODE) */
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.8);
+        --glass-border: 1px solid rgba(0, 0, 0, 0.08);
+        --glass-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+        --backdrop: blur(20px);
+        
+        --text-main: #0f172a;   /* Deep Blue/Black */
+        --text-muted: #64748b;  /* Standard Grey */
+        --accent: #4f46e5;      /* Indigo */
+        --icon-bg: rgba(0, 0, 0, 0.05);
+        
+        --input-bg: rgba(255, 255, 255, 0.5);
+        --radius-lg: 24px;
+        --radius-md: 16px;
+        
+        --welcome-grad: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
     }
 
-    /* CARDS */
-    .dash-card {
-        background: white;
-        border-radius: 12px;
-        padding: 25px;
-        border: 1px solid #e5e7eb;
-        height: 100%;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-    }
-    .dash-title {
-        font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #9ca3af; margin-bottom: 20px; letter-spacing: 0.5px;
+    /* 2. DIM MODE (Dark Blue Background) */
+    [data-theme="dim"] {
+        --glass-bg: rgba(30, 41, 59, 0.7);   
+        --glass-border: 1px solid rgba(255, 255, 255, 0.15); /* Stronger Border */
+        --glass-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        
+        --text-main: #ffffff;   /* Pure White */
+        --text-muted: #cbd5e1;  /* Light Silver (High Contrast) */
+        --accent: #818cf8;
+        --icon-bg: rgba(255, 255, 255, 0.1);
+        
+        --input-bg: rgba(0, 0, 0, 0.3);
+        --welcome-grad: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%);
     }
 
-    /* WELCOME BANNER */
-    .welcome-banner {
-        background: linear-gradient(135deg, #111 0%, #333 100%);
-        color: white;
-        border-radius: 12px;
-        padding: 40px;
-        margin-bottom: 30px;
-        position: relative;
+    /* 3. LIGHTS OUT (Pure Black Background) */
+    [data-theme="lights-out"] {
+        --glass-bg: rgba(20, 20, 20, 0.8);   /* Dark Grey, not Black */
+        --glass-border: 1px solid rgba(255, 255, 255, 0.25); /* Very Visible Border */
+        
+        --text-main: #ffffff;   /* Pure White */
+        --text-muted: #e5e5e5;  /* Almost White (Maximum Contrast) */
+        --accent: #a78bfa;
+        --icon-bg: rgba(255, 255, 255, 0.15);
+        
+        --input-bg: rgba(255, 255, 255, 0.1);
+        --welcome-grad: linear-gradient(135deg, #171717 0%, #262626 100%);
+    }
+
+    /* --- COMPONENTS --- */
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: var(--backdrop);
+        -webkit-backdrop-filter: var(--backdrop);
+        border: var(--glass-border);
+        box-shadow: var(--glass-shadow);
+        border-radius: var(--radius-lg);
         overflow: hidden;
+        transition: background 0.3s, border-color 0.3s;
+        color: var(--text-main);
     }
-    .welcome-text h1 { font-weight: 800; margin-bottom: 10px; }
+
+    .btn-primary-glass {
+        background: var(--accent); color: white;
+        padding: 12px 30px; border-radius: 50px; border: none; font-weight: 700;
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+        transition: 0.2s;
+    }
+    .btn-primary-glass:hover { transform: translateY(-2px); opacity: 0.9; color: white; }
+
+    /* --- DASHBOARD HEADER --- */
+    .dash-header {
+        position: relative; padding: 40px 0; margin-bottom: 30px;
+    }
+    .welcome-card {
+        background: var(--welcome-grad);
+        color: white; padding: 40px; border-radius: var(--radius-lg);
+        position: relative; overflow: hidden;
+        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* --- STAT CARDS --- */
+    .stat-card {
+        padding: 25px; display: flex; flex-direction: column; height: 100%;
+        position: relative;
+    }
+    .stat-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+    .stat-icon {
+        width: 50px; height: 50px; border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; margin-bottom: 15px;
+        background: var(--icon-bg); 
+        color: var(--text-main);
+    }
+    .stat-label {
+        font-size: 0.85rem; font-weight: 700; color: var(--text-muted); 
+        letter-spacing: 0.5px; text-transform: uppercase;
+        opacity: 0.9; /* Boost visibility */
+    }
     
-    /* PROGRESS BAR */
-    .progress { height: 10px; border-radius: 10px; background-color: #e5e7eb; }
-    .progress-bar { background-color: #10b981; border-radius: 10px; }
-
-    /* LIST ITEMS */
-    .activity-item {
-        padding: 15px 0;
-        border-bottom: 1px solid #f3f4f6;
-        display: flex;
-        align-items: start;
+    /* --- LIST ITEMS --- */
+    .project-item {
+        padding: 20px; border-bottom: var(--glass-border);
+        display: flex; align-items: center; gap: 15px;
+        transition: 0.2s; text-decoration: none; color: var(--text-main);
     }
-    .activity-item:last-child { border-bottom: none; }
-    .activity-icon {
-        width: 35px; height: 35px; border-radius: 50%; background: #f3f4f6;
-        display: flex; align-items: center; justify-content: center; margin-right: 15px; color: #6b7280;
-    }
+    .project-item:hover { background: var(--input-bg); }
+    .project-item:last-child { border-bottom: none; }
+    
+    /* FIX: Make Chevron Visible */
+    .chevron-icon { color: var(--text-muted); opacity: 0.8; font-size: 0.9rem; }
 
-    /* RESPONSIVE */
-    @media (max-width: 992px) {
-        .dash-grid { grid-template-columns: 1fr; }
+    /* --- WIZARD / ONBOARDING --- */
+    body.modal-open .dashboard-content { filter: blur(10px); pointer-events: none; }
+    
+    .hero-modal-content {
+        background: var(--glass-bg); backdrop-filter: blur(30px);
+        border: var(--glass-border); border-radius: var(--radius-lg);
+        min-height: 600px; display: flex; flex-direction: column;
+        color: var(--text-main);
+        box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5);
+    }
+    
+    .wizard-progress { height: 4px; background: var(--input-bg); width: 100%; }
+    .wizard-bar { height: 100%; background: var(--accent); width: 33%; transition: width 0.5s ease; }
+
+    .role-card {
+        border: 2px solid transparent; background: var(--input-bg);
+        border-radius: var(--radius-md); padding: 20px; cursor: pointer;
+        transition: 0.2s; position: relative; color: var(--text-main);
+    }
+    .role-card:hover { transform: scale(1.02); border-color: var(--text-muted); }
+    .role-card.selected { border-color: var(--accent); background: rgba(79, 70, 229, 0.1); }
+    .role-card input { position: absolute; opacity: 0; }
+
+    .wiz-input {
+        background: var(--input-bg); border: 1px solid var(--glass-border);
+        color: var(--text-main); border-radius: var(--radius-md);
+        padding: 15px; width: 100%; outline: none; transition: 0.2s;
+    }
+    .wiz-input:focus { border-color: var(--accent); background: var(--glass-bg); }
+    .wiz-label {
+        font-size: 0.75rem; font-weight: 700; color: var(--text-muted);
+        text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block;
     }
 </style>
 
-<div class="container py-5">
-    
-    <div class="welcome-banner">
-        <div class="row align-items-center position-relative" style="z-index: 2;">
-            <div class="col-lg-8">
-                <div class="welcome-text">
-                    <h1>Hello, {{ user.first_name|default:user.username }}!</h1>
-                    <p class="opacity-75 mb-4" style="font-size: 1.1rem;">Here is what's happening with your profile today.</p>
-                    <a href="{% url 'profile_detail' user.profile.pk %}" class="btn btn-light fw-bold rounded-pill px-4">
-                        <i class="fas fa-eye me-2"></i>View Public Profile
-                    </a>
-                </div>
-            </div>
-            <div class="col-lg-4 text-end d-none d-lg-block">
-                <i class="fas fa-chart-line text-white opacity-25" style="font-size: 8rem;"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="dash-grid">
-        
-        <div class="dash-card">
-            <div class="dash-title">Profile Strength</div>
-            
-            <div class="text-center py-4">
-                <h1 class="display-4 fw-bold text-dark mb-0">{{ completeness }}%</h1>
-                <p class="text-muted small">Completion Rate</p>
-            </div>
-
-            <div class="progress mb-3">
-                <div class="progress-bar" role="progressbar" style="width: {{ completeness }}%"></div>
-            </div>
-
-            <ul class="list-unstyled small text-muted mt-4">
-                <li class="mb-2"><i class="fas fa-check-circle {% if user.profile.bio %}text-success{% else %}text-light{% endif %} me-2"></i> Bio Added</li>
-                <li class="mb-2"><i class="fas fa-check-circle {% if user.profile.skills.exists %}text-success{% else %}text-light{% endif %} me-2"></i> Skills Listed</li>
-                <li class="mb-2"><i class="fas fa-check-circle {% if user.profile.cover_photo %}text-success{% else %}text-light{% endif %} me-2"></i> Cover Photo Set</li>
-            </ul>
-
-            <div class="d-grid mt-4">
-                <a href="{% url 'profile_update' %}" class="btn btn-outline-dark btn-sm">Complete Profile</a>
-            </div>
-        </div>
-
-        <div class="dash-card">
-            <div class="dash-title">Recent Activity</div>
-            
-            <div style="max-height: 300px; overflow-y: auto;">
-                {% for notif in notifications %}
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <div>
-                        <p class="mb-0 small fw-bold text-dark">{{ notif.message }}</p>
-                        <small class="text-muted" style="font-size: 0.7rem;">{{ notif.created_at|date:"M d, H:i" }}</small>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="text-center py-5">
-                    <p class="text-muted small">No recent activity.</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="dash-card">
-            <div class="dash-title">Performance</div>
-            
-            <div class="row g-2 mb-4">
-                <div class="col-6">
-                    <div class="bg-light p-3 rounded text-center">
-                        <h4 class="fw-bold mb-0">{{ reviews.count }}</h4>
-                        <small class="text-muted" style="font-size: 0.7rem;">TOTAL REVIEWS</small>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="bg-light p-3 rounded text-center">
-                        <h4 class="fw-bold mb-0 text-success">
-                            {% if user.profile.is_verified %}Yes{% else %}No{% endif %}
-                        </h4>
-                        <small class="text-muted" style="font-size: 0.7rem;">VERIFIED</small>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dash-title mb-3">Latest Review</div>
-            {% if reviews %}
-                <div class="bg-light p-3 rounded border">
-                    <div class="d-flex justify-content-between mb-2">
-                        <small class="fw-bold">{{ reviews.first.author.username }}</small>
-                        <small class="text-warning"><i class="fas fa-star"></i> {{ reviews.first.rating }}</small>
-                    </div>
-                    <p class="small text-muted mb-0 fst-italic">"{{ reviews.first.comment|truncatewords:10 }}"</p>
-                </div>
-            {% else %}
-                <p class="text-muted small text-center py-3 border rounded border-dashed">
-                    No reviews yet. 
-                </p>
-            {% endif %}
-        </div>
-
+{% if not user.profile %}
+<div class="container py-5 text-center mt-5">
+    <div class="glass-card p-5" style="border-color: #ef4444;">
+        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+        <h2 class="fw-bold" style="color: var(--text-main)">Profile Missing</h2>
+        <p class="text-muted">The user exists, but the profile table is empty.</p>
     </div>
 </div>
 
+{% else %}
+
+<div class="dashboard-content container py-4">
+    
+    <div class="dash-header">
+        <div class="row align-items-end mb-4">
+            <div class="col-md-8">
+                <h1 class="fw-bold mb-1" style="color: var(--text-main)">Dashboard</h1>
+                <p style="color: var(--text-muted)">Overview for {{ user.username }}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <span class="badge rounded-pill px-3 py-2" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <i class="fas fa-circle me-1" style="font-size: 8px;"></i> Online
+                </span>
+            </div>
+        </div>
+
+        <div class="welcome-card">
+            <div style="position: relative; z-index: 2;">
+                <h2 class="fw-bold display-6 mb-2">Find your next big project.</h2>
+                <p class="opacity-75 mb-4" style="max-width: 500px;">Your profile is active and visible. Improve your chances by adding a portfolio item.</p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'job_list' %}" class="btn btn-light rounded-pill px-4 fw-bold" style="color: #312e81">Find Work</a>
+                    <a href="{% url 'profile_update' %}" class="btn btn-outline-light rounded-pill px-4">Edit Profile</a>
+                </div>
+            </div>
+            <i class="fas fa-rocket" style="position: absolute; right: -20px; bottom: -30px; font-size: 10rem; opacity: 0.1; transform: rotate(-15deg);"></i>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        
+        <div class="col-lg-8">
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="glass-card stat-card">
+                        <div class="stat-icon"><i class="fas fa-eye"></i></div>
+                        <h2 class="fw-bold mb-0">{{ user.profile.profile_views|default:"0" }}</h2>
+                        <div class="stat-label">PROFILE VIEWS</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card stat-card">
+                        <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
+                        <h2 class="fw-bold mb-0">{{ user.jobs_applied.count|default:"0" }}</h2>
+                        <div class="stat-label">APPLICATIONS</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card stat-card">
+                        <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                        <h2 class="fw-bold mb-0">$0.00</h2>
+                        <div class="stat-label">EARNINGS</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div class="p-4 border-bottom" style="border-color: var(--glass-border);">
+                    <h5 class="fw-bold mb-0">Active Projects</h5>
+                </div>
+                <div>
+                    <div class="p-5 text-center">
+                        <div style="width: 60px; height: 60px; background: var(--icon-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                            <i class="fas fa-folder-open fs-4" style="color: var(--text-muted);"></i>
+                        </div>
+                        <h6 class="fw-bold" style="color: var(--text-main)">No active projects</h6>
+                        <p style="color: var(--text-muted); opacity: 0.9;">When you are hired, your jobs will appear here.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-4">
+            
+            <div class="glass-card p-4 mb-4 text-center">
+                <div style="position: relative; width: 100px; height: 100px; margin: 0 auto 15px;">
+                    <svg viewBox="0 0 36 36" style="width: 100%; height: 100%; transform: rotate(-90deg);">
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--icon-bg)" stroke-width="3" />
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="85, 100" />
+                    </svg>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 800; font-size: 1.2rem;">85%</div>
+                </div>
+                <h5 class="fw-bold">Profile Strength</h5>
+                <p class="small mb-3" style="color: var(--text-muted);">Complete your portfolio to reach 100%.</p>
+                <a href="{% url 'profile_update' %}" class="btn btn-sm btn-outline-primary rounded-pill w-100">Update Info</a>
+            </div>
+
+            <div class="glass-card p-3">
+                <div class="small fw-bold text-uppercase mb-3 px-2" style="color: var(--text-muted);">Quick Access</div>
+                
+                <a href="{% url 'wallet' %}" class="project-item rounded-3 mb-2">
+                    <i class="fas fa-credit-card" style="color: var(--text-muted)"></i>
+                    <div style="flex:1">Wallet</div>
+                    <i class="fas fa-chevron-right chevron-icon"></i>
+                </a>
+                <a href="{% url 'verify_identity' %}" class="project-item rounded-3 mb-2">
+                    <i class="fas fa-shield-alt" style="color: var(--text-muted)"></i>
+                    <div style="flex:1">Verification</div>
+                    <i class="fas fa-chevron-right chevron-icon"></i>
+                </a>
+                <a href="{% url 'settings' %}" class="project-item rounded-3">
+                    <i class="fas fa-cog" style="color: var(--text-muted)"></i>
+                    <div style="flex:1">Settings</div>
+                    <i class="fas fa-chevron-right chevron-icon"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% if not user.profile.onboarding_complete %}
+
+<div class="modal fade show" id="onboardingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" style="display: block;" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content hero-modal-content shadow-lg">
+            
+            <form id="wizardForm" action="{% url 'complete_onboarding' %}" method="POST" style="height: 100%; display: flex; flex-direction: column;">
+                {% csrf_token %}
+                
+                <div class="p-4 border-bottom" style="border-color: var(--glass-border);">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="fw-bold h5 mb-0" style="color: var(--text-main)">Setup Profile</div>
+                        <span class="badge bg-primary rounded-pill">Step <span id="stepNumber">1</span>/3</span>
+                    </div>
+                    <div class="wizard-progress rounded-pill">
+                        <div class="wizard-bar rounded-pill" id="progressBar"></div>
+                    </div>
+                </div>
+
+                <div style="flex: 1; overflow-y: auto; padding: 40px;">
+                    
+                    <div class="wizard-step active" id="step1">
+                        <h2 class="fw-bold mb-2" style="color: var(--text-main);">Welcome! Let's start.</h2>
+                        <p class="text-muted mb-4">Select your role and confirm your details.</p>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-6">
+                                <label class="role-card selected" onclick="selectRole(this)">
+                                    <input type="radio" name="role" value="freelancer" checked>
+                                    <i class="fas fa-laptop-code fs-3 mb-2" style="color: var(--accent)"></i>
+                                    <div class="fw-bold" style="color: var(--text-main)">Freelancer</div>
+                                    <div class="small text-muted">I want to work</div>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="role-card" onclick="selectRole(this)">
+                                    <input type="radio" name="role" value="client">
+                                    <i class="fas fa-user-tie fs-3 mb-2" style="color: var(--text-muted)"></i>
+                                    <div class="fw-bold" style="color: var(--text-main)">Client</div>
+                                    <div class="small text-muted">I want to hire</div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="wiz-label">Email Address</label>
+                            <input type="email" name="email" class="wiz-input" value="{{ user.email }}" required>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="wiz-label">Location</label>
+                                <input type="text" name="location" class="wiz-input" placeholder="City, Country" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="wiz-label">English Level</label>
+                                <select name="english_level" class="wiz-input">
+                                    <option value="fluent">Fluent</option>
+                                    <option value="native">Native / Bilingual</option>
+                                    <option value="basic">Basic</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wizard-step d-none" id="step2">
+                        <h2 class="fw-bold mb-2" style="color: var(--text-main);">Professional Info</h2>
+                        <p class="text-muted mb-4">Tell us about your expertise.</p>
+                        
+                        <div class="mb-3">
+                            <label class="wiz-label">Professional Headline</label>
+                            <input type="text" name="headline" class="wiz-input" placeholder="e.g. Senior Full Stack Engineer" required>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="wiz-label">Years Exp.</label>
+                                <input type="number" name="years_experience" class="wiz-input" placeholder="0" min="0" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="wiz-label">Availability</label>
+                                <select name="availability" class="wiz-input">
+                                    <option value="available">🟢 Available</option>
+                                    <option value="open">🟡 Open to offers</option>
+                                    <option value="busy">🔴 Busy</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="wiz-label">Current Company</label>
+                                <input type="text" name="company_name" class="wiz-input" placeholder="Optional">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="wiz-label">Portfolio Link</label>
+                                <input type="url" name="project_link" class="wiz-input" placeholder="https://...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wizard-step d-none" id="step3">
+                        <h2 class="fw-bold mb-2" style="color: var(--text-main);">Showcase</h2>
+                        <p class="text-muted mb-4">What tools do you use?</p>
+                        
+                        <div class="mb-3">
+                            <label class="wiz-label">Top Skills (Comma Separated)</label>
+                            <input type="text" name="skills" class="wiz-input" placeholder="Python, Django, React..." required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="wiz-label">Tools & Tech</label>
+                            <input type="text" name="tools" class="wiz-input" placeholder="VS Code, Figma, AWS..." required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="wiz-label">Hourly Rate ($)</label>
+                            <input type="number" name="hourly_rate" class="wiz-input" placeholder="45.00" step="0.50">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="p-4 border-top d-flex justify-content-between align-items-center" style="border-color: var(--glass-border);">
+                    <button type="button" class="btn btn-link text-muted text-decoration-none" id="prevBtn" onclick="nextPrev(-1)" style="visibility: hidden;">Back</button>
+                    <button type="button" class="btn-primary-glass" id="nextBtn" onclick="nextPrev(1)">Continue</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.body.classList.add('modal-open');
+    
+    // Logic for Steps
+    let currentStep = 0;
+    const steps = [document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3')];
+    const progressBar = document.getElementById("progressBar");
+    const stepNumber = document.getElementById("stepNumber");
+    const nextBtn = document.getElementById("nextBtn");
+    const prevBtn = document.getElementById("prevBtn");
+
+    function showStep(n) {
+        steps.forEach(el => el.classList.add('d-none'));
+        steps.forEach(el => el.classList.remove('active'));
+        
+        steps[n].classList.remove('d-none');
+        setTimeout(() => steps[n].classList.add('active'), 10);
+
+        stepNumber.innerText = n + 1;
+        progressBar.style.width = ((n + 1) / steps.length) * 100 + "%";
+        
+        prevBtn.style.visibility = n === 0 ? "hidden" : "visible";
+        nextBtn.innerText = n === (steps.length - 1) ? "Launch 🚀" : "Continue";
+    }
+
+    function nextPrev(n) {
+        if (n === 1 && !validateForm()) return false;
+        
+        currentStep += n;
+        
+        if (currentStep >= steps.length) {
+            document.getElementById("wizardForm").submit();
+            return false;
+        }
+        showStep(currentStep);
+    }
+
+    function validateForm() {
+        const inputs = steps[currentStep].querySelectorAll("input[required], select[required]");
+        let valid = true;
+        inputs.forEach(input => {
+            if (!input.checkValidity()) { 
+                input.reportValidity(); 
+                valid = false; 
+            }
+        });
+        return valid;
+    }
+
+    function selectRole(card) {
+        document.querySelectorAll('.role-card').forEach(c => {
+            c.classList.remove('selected');
+            c.querySelector('i').style.color = 'var(--text-muted)';
+        });
+        card.classList.add('selected');
+        card.querySelector('input').checked = true;
+        card.querySelector('i').style.color = 'var(--accent)';
+    }
+</script>
+
+{% endif %}
+
+<div class="modal fade" id="welcomeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="hero-modal-content p-5 text-center" style="min-height: auto;">
+            <div style="width: 80px; height: 80px; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2.5rem;">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2 class="fw-bold mb-2" style="color:var(--text-main)">You're All Set! 🎉</h2>
+            <p class="text-muted mb-4">Your profile is now live.</p>
+            <button type="button" class="btn-primary-glass" data-bs-dismiss="modal">Go to Dashboard</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('welcome')) {
+            var welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
+            welcomeModal.show();
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, '', newUrl);
+        }
+    });
+</script>
+
+{% endif %}
 {% endblock %}

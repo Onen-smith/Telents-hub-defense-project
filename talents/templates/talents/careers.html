@@ -3,238 +3,216 @@
 {% block content %}
 
 <style>
-    /* 1. Hero Header */
-    .careers-header {
-        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    /* 1. HERO SECTION */
+    .career-hero {
+        background: radial-gradient(circle at top right, #1e3a8a 0%, #0f172a 100%);
         color: white;
-        padding: 80px 0;
-        text-align: center;
-        margin-bottom: 50px;
+        padding: 100px 0 120px;
+        position: relative;
+        overflow: hidden;
+    }
+    .career-hero::after {
+        content: "";
+        position: absolute; bottom: 0; left: 0; right: 0;
+        height: 60px;
+        background: var(--bg-body);
+        clip-path: polygon(0 100%, 100% 100%, 100% 0);
     }
 
-    /* 2. Job Card Styling */
-    .job-card {
-        border: 1px solid #e5e7eb;
+    /* 2. VALUES / PERKS GRID */
+    .value-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        padding: 30px;
+        border-radius: 16px;
+        height: 100%;
+        transition: transform 0.2s;
+    }
+    .value-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+    
+    .icon-box {
+        width: 50px; height: 50px;
+        background: rgba(37, 99, 235, 0.1);
+        color: var(--accent);
         border-radius: 12px;
-        transition: all 0.3s ease;
-        background: white;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.25rem;
         margin-bottom: 20px;
     }
-    
-    .job-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-        border-color: #667eea; /* Purple accent on hover */
-    }
 
-    /* 3. Badge Styling */
-    .badge-soft {
-        background-color: #f3f4f6;
-        color: #4b5563;
-        font-weight: 600;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 0.8rem;
-    }
-
-    /* 4. Responsive Layout Fixes */
-    /* On mobile, we center text and make button full width. On desktop, we align left/right. */
-    .job-card-body {
-        display: flex;
-        flex-direction: column; /* Stack vertically by default (Mobile) */
-        text-align: center;
+    /* 3. JOB LISTINGS (Sleek Rows) */
+    .job-row {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
         padding: 25px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.2s;
+        text-decoration: none;
+        position: relative;
+    }
+    .job-row:hover {
+        border-color: var(--accent);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        transform: scale(1.01);
     }
 
-    @media (min-width: 768px) {
-        .job-card-body {
-            flex-direction: row; /* Side by side on Desktop */
-            justify-content: space-between;
-            align-items: center;
-            text-align: left;
-        }
+    .job-title { font-weight: 700; color: var(--text-main); font-size: 1.1rem; margin-bottom: 4px; }
+    .job-meta { font-size: 0.85rem; color: var(--text-muted); }
+    
+    .dept-badge {
+        font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        padding: 6px 12px; border-radius: 30px;
+        background: rgba(16, 185, 129, 0.1); color: #10b981;
     }
+    .dept-eng { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .dept-mkt { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
 
-    /* 5. Perks Section */
-    .perk-box {
-        text-align: center;
-        padding: 30px;
-        background: #f9fafb;
-        border-radius: 15px;
-        height: 100%;
-    }
-    .perk-icon {
-        width: 60px; height: 60px;
-        background: white;
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        margin: 0 auto 20px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        color: #764ba2;
-        font-size: 1.5rem;
+    /* Responsive */
+    @media (max-width: 768px) {
+        .job-row { flex-direction: column; align-items: flex-start; gap: 15px; }
+        .job-action { width: 100%; }
+        .btn-apply { width: 100%; }
     }
 </style>
 
-<div class="careers-header">
+<div class="career-hero text-center">
     <div class="container">
-        <h1 class="fw-bold display-5 mb-3">Join Our Mission</h1>
+        <span class="badge bg-white bg-opacity-25 border border-white border-opacity-25 px-3 py-2 rounded-pill mb-3">
+            We are hiring 🚀
+        </span>
+        <h1 class="display-4 fw-bold mb-3">Build the Future of Work</h1>
         <p class="lead text-white-50 mx-auto" style="max-width: 600px;">
-            We are building the future of freelance work in Nigeria. Come help us connect talent with opportunity.
+            TalentHub is democratizing access to opportunities in Nigeria. Join our team of dreamers, doers, and builders.
         </p>
     </div>
 </div>
 
-<div class="container pb-5">
-    
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <h4 class="fw-bold mb-4">Open Positions</h4>
-
-            <div class="job-card">
-                <div class="job-card-body">
-                    <div class="mb-3 mb-md-0"> <h5 class="fw-bold mb-1">Senior Django Developer</h5>
-                        <div class="mt-2">
-                            <span class="badge-soft me-2"><i class="fas fa-map-marker-alt me-1"></i> Remote</span>
-                            <span class="badge-soft"><i class="fas fa-clock me-1"></i> Full Time</span>
-                        </div>
-                    </div>
-                    <div>
-                        <button class="btn btn-dark rounded-pill px-4 w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#applyModal">Apply Now
-</button>
-                    </div>
-                </div>
+<div class="container py-5" style="margin-top: -60px; position: relative; z-index: 2;">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="value-card shadow-sm">
+                <div class="icon-box"><i class="fas fa-globe-africa"></i></div>
+                <h5 class="fw-bold" style="color: var(--text-main);">Remote First</h5>
+                <p class="text-muted small mb-0">Work from Lagos, Abuja, or anywhere. We care about output, not hours in a chair.</p>
             </div>
-
-            <div class="job-card">
-                <div class="job-card-body">
-                    <div class="mb-3 mb-md-0">
-                        <h5 class="fw-bold mb-1">Product Designer (UI/UX)</h5>
-                        <div class="mt-2">
-                            <span class="badge-soft me-2"><i class="fas fa-map-marker-alt me-1"></i> Lagos, NG</span>
-                            <span class="badge-soft"><i class="fas fa-clock me-1"></i> Hybrid</span>
-                        </div>
-                    </div>
-                    <div>
-                        <button class="btn btn-dark rounded-pill px-4 w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#applyModal">
-    Apply Now
-</button>
-                    </div>
-                </div>
+        </div>
+        <div class="col-md-4">
+            <div class="value-card shadow-sm">
+                <div class="icon-box"><i class="fas fa-heartbeat"></i></div>
+                <h5 class="fw-bold" style="color: var(--text-main);">Premium Health</h5>
+                <p class="text-muted small mb-0">We cover 100% of health insurance for you and 50% for your dependents.</p>
             </div>
-
-            <div class="job-card">
-                <div class="job-card-body">
-                    <div class="mb-3 mb-md-0">
-                        <h5 class="fw-bold mb-1">Marketing Manager</h5>
-                        <div class="mt-2">
-                            <span class="badge-soft me-2"><i class="fas fa-map-marker-alt me-1"></i> Abuja, NG</span>
-                            <span class="badge-soft"><i class="fas fa-clock me-1"></i> Full Time</span>
-                        </div>
-                    </div>
-                    <div>
-                        <button class="btn btn-dark rounded-pill px-4 w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#applyModal">
-    Apply Now
-</button>
-                    </div>
-                </div>
+        </div>
+        <div class="col-md-4">
+            <div class="value-card shadow-sm">
+                <div class="icon-box"><i class="fas fa-laptop-code"></i></div>
+                <h5 class="fw-bold" style="color: var(--text-main);">Top Gear</h5>
+                <p class="text-muted small mb-0">Every new joiner gets a brand new MacBook Pro and a home office stipend.</p>
             </div>
-
-            <div class="job-card">
-                <div class="job-card-body">
-                    <div class="mb-3 mb-md-0">
-                        <h5 class="fw-bold mb-1">Customer Success Specialist</h5>
-                        <div class="mt-2">
-                            <span class="badge-soft me-2"><i class="fas fa-map-marker-alt me-1"></i> Remote</span>
-                            <span class="badge-soft"><i class="fas fa-clock me-1"></i> Contract</span>
-                        </div>
-                    </div>
-                    <div>
-                        <button class="btn btn-dark rounded-pill px-4 w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#applyModal">
-    Apply Now
-</button>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 </div>
 
-<div class="py-5 bg-white border-top">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h3 class="fw-bold">Why join TalentHub?</h3>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h3 class="fw-bold" style="color: var(--text-main);">Open Roles</h3>
+            <p class="text-muted mb-0">Come do the best work of your life.</p>
         </div>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="perk-box">
-                    <div class="perk-icon"><i class="fas fa-heartbeat"></i></div>
-                    <h5 class="fw-bold">Health & Wellness</h5>
-                    <p class="text-muted small">Comprehensive health insurance for you and your family.</p>
-                </div>
+        <a href="#" class="text-decoration-none fw-bold">View all teams <i class="fas fa-arrow-right small ms-1"></i></a>
+    </div>
+
+    <div class="job-row">
+        <div>
+            <div class="d-flex align-items-center gap-3 mb-1">
+                <div class="job-title">Senior Django Engineer</div>
+                <span class="dept-badge dept-eng">Engineering</span>
             </div>
-            <div class="col-md-4">
-                <div class="perk-box">
-                    <div class="perk-icon"><i class="fas fa-laptop-house"></i></div>
-                    <h5 class="fw-bold">Remote Friendly</h5>
-                    <p class="text-muted small">Work from anywhere. We value output over hours.</p>
-                </div>
+            <div class="job-meta">
+                <i class="fas fa-map-marker-alt me-1"></i> Remote (Nigeria) &bull; <i class="far fa-clock ms-1 me-1"></i> Full Time
             </div>
-            <div class="col-md-4">
-                <div class="perk-box">
-                    <div class="perk-icon"><i class="fas fa-graduation-cap"></i></div>
-                    <h5 class="fw-bold">Learning Budget</h5>
-                    <p class="text-muted small">Annual stipend for courses, books, and conferences.</p>
-                </div>
-            </div>
+        </div>
+        <div class="job-action">
+            <button class="btn btn-outline-primary rounded-pill px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#applyModal">Apply Now</button>
         </div>
     </div>
+
+    <div class="job-row">
+        <div>
+            <div class="d-flex align-items-center gap-3 mb-1">
+                <div class="job-title">Product Designer (UI/UX)</div>
+                <span class="dept-badge">Design</span>
+            </div>
+            <div class="job-meta">
+                <i class="fas fa-map-marker-alt me-1"></i> Lagos, NG &bull; <i class="far fa-clock ms-1 me-1"></i> Hybrid
+            </div>
+        </div>
+        <div class="job-action">
+            <button class="btn btn-outline-primary rounded-pill px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#applyModal">Apply Now</button>
+        </div>
+    </div>
+
+    <div class="job-row">
+        <div>
+            <div class="d-flex align-items-center gap-3 mb-1">
+                <div class="job-title">Growth Marketing Manager</div>
+                <span class="dept-badge dept-mkt">Marketing</span>
+            </div>
+            <div class="job-meta">
+                <i class="fas fa-map-marker-alt me-1"></i> Abuja, NG &bull; <i class="far fa-clock ms-1 me-1"></i> Full Time
+            </div>
+        </div>
+        <div class="job-action">
+            <button class="btn btn-outline-primary rounded-pill px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#applyModal">Apply Now</button>
+        </div>
+    </div>
+
+     <div class="job-row">
+        <div>
+            <div class="d-flex align-items-center gap-3 mb-1">
+                <div class="job-title">Customer Success Specialist</div>
+                <span class="dept-badge dept-mkt">Support</span>
+            </div>
+            <div class="job-meta">
+                <i class="fas fa-map-marker-alt me-1"></i> Remote &bull; <i class="far fa-clock ms-1 me-1"></i> Contract
+            </div>
+        </div>
+        <div class="job-action">
+            <button class="btn btn-outline-primary rounded-pill px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#applyModal">Apply Now</button>
+        </div>
+    </div>
+
 </div>
+
+<div class="container py-5 text-center">
+    <div class="p-5 rounded-4" style="background: var(--card-bg); border: 2px dashed var(--border-color);">
+        <h4 class="fw-bold mb-3" style="color: var(--text-main);">Don't see a fit?</h4>
+        <p class="text-muted mb-4">We are always looking for talent. Drop your resume and we'll keep you on file.</p>
+        <button class="btn btn-dark rounded-pill px-5 py-3 fw-bold">Join Talent Network</button>
+    </div>
+</div>
+
 <div class="modal fade" id="applyModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            
+        <div class="modal-content border-0 shadow-lg rounded-4" style="background: var(--card-bg);">
             <div class="modal-header border-0 p-4 pb-0">
-                <h5 class="fw-bold">Apply for Position</h5>
+                <h5 class="fw-bold" style="color: var(--text-main)">Application Received</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
-            <div class="modal-body p-4">
-                <p class="text-muted small mb-4">Please fill out the form below. Our HR team will review your application and get back to you.</p>
-                
-                <form method="POST" action="{% url 'contact' %}">
-                    {% csrf_token %}
-                    
-                    <input type="hidden" name="subject" value="New Job Application">
-
-                    <div class="mb-3">
-                        <label class="fw-bold small text-uppercase text-muted">Full Name</label>
-                        <input type="text" name="name" class="form-control bg-light border-0 py-2" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="fw-bold small text-uppercase text-muted">Email Address</label>
-                        <input type="email" name="email" class="form-control bg-light border-0 py-2" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="fw-bold small text-uppercase text-muted">Portfolio / LinkedIn URL</label>
-                        <input type="url" name="message" class="form-control bg-light border-0 py-2" placeholder="https://..." required>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="fw-bold small text-uppercase text-muted">Upload CV</label>
-                        <input type="file" class="form-control border-0 bg-light">
-                        <small class="text-muted" style="font-size: 0.7rem;">PDF or DOCX only.</small>
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary fw-bold py-2 rounded-pill">Submit Application</button>
-                    </div>
-                </form>
+            <div class="modal-body p-4 text-center">
+                <div class="mb-3 text-success display-4"><i class="far fa-check-circle"></i></div>
+                <h5 class="fw-bold" style="color: var(--text-main);">Thanks for your interest!</h5>
+                <p class="small text-muted">This is a demo page. In a real app, this would open an application form.</p>
+                <div class="d-grid mt-4">
+                    <button type="button" class="btn btn-primary rounded-pill" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
-
         </div>
     </div>
 </div>
+
 {% endblock %}

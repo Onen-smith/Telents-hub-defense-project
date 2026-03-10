@@ -1,34 +1,51 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    # Core Pages
+    # --- 1. LANDING & STATIC PAGES ---
     path('', views.home, name='home'),
-    path('browse/', views.browse, name='browse'),
-    
-    # Authentication
-    path('register/', views.register, name='register'),
-    path('login/', views.login_view, name='login'),
-    path('logout/', views.logout_view, name='logout'),
-    
-    
-    # Dashboard & Profile
-    path('dashboard/', views.dashboard, name='dashboard'),
-    path('profile/update/', views.profile_update, name='profile_update'),
-    
-    # This is the line that fixed the error (It uses views.profile_detail now)
-    path('profile/<int:pk>/', views.profile_detail, name='profile_detail'),
-
-    # Communication
-    path('contact/', views.contact, name='contact'),
-    path('subscribe/', views.subscribe, name='subscribe'),
-    path('notifications/read/', views.mark_notifications_read, name='mark_notifications_read'),
-    path('notifications/all/', views.all_notifications, name='all_notifications'),
-
-    # Static Pages
     path('about/', views.about, name='about'),
+    path('privacy/', views.privacy, name='privacy'),
     path('careers/', views.careers, name='careers'),
+    path('contact/', views.contact, name='contact'),
     path('blog/', views.blog, name='blog'),
     path('blog/<int:pk>/', views.blog_detail, name='blog_detail'),
-    path('privacy/', views.privacy, name='privacy'),
+
+    # --- 2. AUTHENTICATION ---
+    path('register/', views.register, name='register'),
+    path('login/', auth_views.LoginView.as_view(template_name='talents/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
+
+    # --- 3. DASHBOARD & ONBOARDING ---
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('complete-onboarding/', views.complete_onboarding, name='complete_onboarding'),
+    path('notifications/', views.notifications, name='notifications'),
+    
+    # --- 4. PROFILES ---
+    path('profile/edit/', views.profile_update, name='profile_update'),
+    path('profile/<slug:slug>/', views.profile_detail, name='profile_detail'),
+    path('browse/', views.browse, name='browse'), # Talent Directory
+
+    # --- 5. JOBS (THE MISSING PART) ---
+    path('find-work/', views.job_list, name='job_list'),  # <--- THIS WAS MISSING
+    path('post-job/', views.post_job, name='post_job'),
+    path('my-jobs/', views.my_jobs, name='my_jobs'),
+    path('job/<slug:slug>/', views.job_detail, name='job_detail'),
+    path('job/<slug:slug>/save/', views.toggle_save_job, name='toggle_save_job'),
+    path('job/<slug:slug>/apply/', views.apply_to_job, name='apply_to_job'),
+    path('job/<slug:slug>/manage/', views.manage_job, name='manage_job'),
+    path('job/<slug:slug>/edit/', views.edit_job, name='edit_job'),
+    path('proposal/<int:proposal_id>/hire/', views.create_contract, name='create_contract'),
+    path('contract/<int:pk>/', views.contract_detail, name='contract_detail'),
+    path('messages/', views.inbox, name='inbox'),
+    path('messages/<str:username>/', views.chat_detail, name='chat_detail'),
+    path('api/send-message/', views.send_message_ajax, name='send_message_ajax'),
+    path('wallet/', views.wallet, name='wallet'),
+    path('verify-identity/', views.verify_identity, name='verify_identity'),
+    path('leave-review/', views.leave_review, name='leave_review'),
+    path('profile/@<str:username>/', views.public_profile, name='profile_view'),    
+    path('settings/', views.settings_view, name='settings'),
+    path('payment/checkout/<str:reference>/', views.payment_checkout, name='payment_checkout'),
+    path('payment/verify/<str:reference>/', views.verify_payment, name='verify_payment'),
 ]

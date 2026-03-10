@@ -1,24 +1,188 @@
 {% extends 'talents/base.html' %}
+
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <h1 class="fw-bold mb-4">Privacy Policy</h1>
-            <p class="text-muted">Last updated: December 2025</p>
-            <hr>
-            
-            <h5 class="fw-bold mt-4">1. Information We Collect</h5>
-            <p class="text-muted">We collect information you provide directly to us, such as your name, email address, and skills when you create an account.</p>
 
-            <h5 class="fw-bold mt-4">2. How We Use Information</h5>
-            <p class="text-muted">We use the information to verify your identity, connect you with employers, and send you important updates regarding your account.</p>
+<style>
+    /* 1. HEADER */
+    .legal-header {
+        background: var(--bg-body);
+        border-bottom: 1px solid var(--border-color);
+        padding: 60px 0;
+    }
 
-            <h5 class="fw-bold mt-4">3. Data Security</h5>
-            <p class="text-muted">We implement robust security measures including encryption and secure servers to protect your personal data from unauthorized access.</p>
-            
-            <h5 class="fw-bold mt-4">4. Contact Us</h5>
-            <p class="text-muted">If you have any questions about this Privacy Policy, please contact us at privacy@talenthub.com.</p>
-        </div>
+    /* 2. LAYOUT */
+    .legal-container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+    
+    /* 3. SIDEBAR NAVIGATION (Sticky) */
+    .legal-nav {
+        position: sticky;
+        top: 100px; /* Below the navbar */
+    }
+    .nav-link-legal {
+        display: block;
+        padding: 10px 15px;
+        color: var(--text-muted);
+        text-decoration: none;
+        border-left: 2px solid var(--border-color);
+        transition: all 0.2s;
+        font-size: 0.95rem;
+    }
+    .nav-link-legal:hover, .nav-link-legal.active {
+        color: var(--accent);
+        border-left-color: var(--accent);
+        background: rgba(37, 99, 235, 0.05);
+    }
+
+    /* 4. CONTENT AREA */
+    .legal-content {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 50px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    }
+    
+    .legal-section { margin-bottom: 50px; }
+    
+    .legal-title {
+        font-weight: 800; color: var(--text-main); margin-bottom: 20px;
+        padding-bottom: 15px; border-bottom: 1px solid var(--border-color);
+    }
+    
+    .legal-text {
+        color: var(--text-muted); line-height: 1.8; margin-bottom: 20px;
+        font-size: 1.05rem;
+    }
+    
+    .legal-list {
+        color: var(--text-muted); padding-left: 20px; margin-bottom: 20px;
+    }
+    .legal-list li { margin-bottom: 10px; }
+
+</style>
+
+<div class="legal-header">
+    <div class="container text-center">
+        <h1 class="fw-bold display-5 mb-3" style="color: var(--text-main);">Privacy Policy</h1>
+        <p class="text-muted mb-0">Last Updated: January 15, 2026</p>
     </div>
 </div>
+
+<div class="container py-5 legal-container">
+    <div class="row g-5">
+        
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="legal-nav">
+                <h6 class="fw-bold text-uppercase text-muted small mb-3 px-3">Table of Contents</h6>
+                <a href="#intro" class="nav-link-legal">1. Introduction</a>
+                <a href="#collection" class="nav-link-legal">2. Information We Collect</a>
+                <a href="#usage" class="nav-link-legal">3. How We Use Data</a>
+                <a href="#sharing" class="nav-link-legal">4. Data Sharing</a>
+                <a href="#security" class="nav-link-legal">5. Security</a>
+                <a href="#contact" class="nav-link-legal">6. Contact Us</a>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="legal-content">
+                
+                <section id="intro" class="legal-section">
+                    <h3 class="legal-title">1. Introduction</h3>
+                    <p class="legal-text">
+                        Welcome to TalentHub ("we," "our," or "us"). We are committed to protecting your personal information and your right to privacy. 
+                        When you visit our website and use our services, you trust us with your personal information. We take that privacy seriously.
+                    </p>
+                    <p class="legal-text">
+                        This privacy notice describes how we might use your information if you use our freelance marketplace platform.
+                    </p>
+                </section>
+
+                <section id="collection" class="legal-section">
+                    <h3 class="legal-title">2. Information We Collect</h3>
+                    <p class="legal-text">We collect personal information that you voluntarily provide to us when you register on the website.</p>
+                    <ul class="legal-list">
+                        <li><strong>Personal Data:</strong> Name, email address, phone number, and profile photographs.</li>
+                        <li><strong>Payment Data:</strong> We may collect data necessary to process your payment if you make purchases, such as your payment instrument number (such as a credit card number).</li>
+                        <li><strong>Professional Data:</strong> Skills, education history, portfolio links, and work experience provided in your profile.</li>
+                    </ul>
+                </section>
+
+                <section id="usage" class="legal-section">
+                    <h3 class="legal-title">3. How We Use Your Data</h3>
+                    <p class="legal-text">We use personal information collected via our website for a variety of business purposes described below:</p>
+                    <ul class="legal-list">
+                        <li>To facilitate account creation and logon process.</li>
+                        <li>To enable user-to-user communications (e.g., messaging between Clients and Freelancers).</li>
+                        <li>To manage user accounts and maintain the security of the platform.</li>
+                        <li>To send administrative information to you regarding service updates or changes to our terms.</li>
+                    </ul>
+                </section>
+
+                <section id="sharing" class="legal-section">
+                    <h3 class="legal-title">4. Sharing Your Information</h3>
+                    <p class="legal-text">
+                        We only share information with your consent, to comply with laws, to provide you with services, to protect your rights, or to fulfill business obligations.
+                    </p>
+                    <div class="alert alert-primary border-0 rounded-3 d-flex align-items-center" role="alert">
+                        <i class="fas fa-info-circle fs-4 me-3"></i>
+                        <div>
+                            <strong>Note:</strong> We do NOT sell your personal data to third-party advertisers. Your data is used strictly to operate the TalentHub marketplace.
+                        </div>
+                    </div>
+                </section>
+
+                <section id="security" class="legal-section">
+                    <h3 class="legal-title">5. Data Security</h3>
+                    <p class="legal-text">
+                        We have implemented appropriate technical and organizational security measures designed to protect the security of any personal information we process. 
+                        However, please also remember that we cannot guarantee that the internet itself is 100% secure.
+                    </p>
+                </section>
+
+                <section id="contact" class="legal-section mb-0">
+                    <h3 class="legal-title">6. Contact Us</h3>
+                    <p class="legal-text">
+                        If you have questions or comments about this policy, you may email us at <a href="mailto:privacy@talenthub.com">privacy@talenthub.com</a> or by post to:
+                    </p>
+                    <address class="text-muted border-start border-4 ps-3 border-primary">
+                        <strong>TalentHub Inc.</strong><br>
+                        123 Innovation Drive<br>
+                        Lagos State, Nigeria
+                    </address>
+                </section>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // This highlights the sidebar link when you scroll to that section
+    document.addEventListener("DOMContentLoaded", function() {
+        const sections = document.querySelectorAll(".legal-section");
+        const navLinks = document.querySelectorAll(".nav-link-legal");
+
+        window.addEventListener("scroll", () => {
+            let current = "";
+            sections.forEach((section) => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 150) {
+                    current = section.getAttribute("id");
+                }
+            });
+
+            navLinks.forEach((link) => {
+                link.classList.remove("active");
+                if (link.getAttribute("href").includes(current)) {
+                    link.classList.add("active");
+                }
+            });
+        });
+    });
+</script>
+
 {% endblock %}

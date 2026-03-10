@@ -1,0 +1,131 @@
+{% extends 'talents/base.html' %}
+{% load static %}
+{% load socialaccount %}
+
+{% block navbar %}{% endblock %}
+{% block mobile_nav %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<style>
+    /* LAYOUT: Locked to Screen Height */
+    .auth-container {
+        display: grid;
+        grid-template-columns: 450px 1fr;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        background-color: var(--bg-body);
+    }
+
+    /* LEFT: FORM SIDE */
+    .auth-form-side {
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        background: var(--bg-body);
+        overflow-y: auto;
+    }
+
+    /* RIGHT: IMAGE SIDE */
+    .auth-brand-side {
+        position: relative;
+        background: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
+        height: 100%;
+        width: 100%;
+    }
+    .auth-brand-side::before {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.4));
+    }
+
+    /* TEXT */
+    .brand-content { 
+        position: absolute; top: 50%; transform: translateY(-50%); 
+        left: 60px; right: 60px; z-index: 2; color: white; max-width: 600px; 
+    }
+    .auth-title { font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 5px; }
+    .auth-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; }
+
+    /* FORM STYLING */
+    .modern-input {
+        width: 100%; padding: 12px 15px; background: var(--bg-body);
+        border: 1px solid var(--border); border-radius: 8px;
+        color: var(--text-main); font-size: 0.95rem; margin-bottom: 15px;
+    }
+    .modern-input:focus { border-color: var(--primary); outline: none; }
+    
+    /* Hide the ugly default labels */
+    label { 
+        font-size: 0.85rem; font-weight: 700; color: var(--text-muted); 
+        margin-bottom: 5px; display: block; text-transform: uppercase;
+    }
+    
+    .btn-submit {
+        width: 100%; padding: 14px; border-radius: 8px;
+        background: var(--text-main); color: var(--bg-body);
+        font-weight: 700; border: none; cursor: pointer; margin-top: 10px;
+    }
+    
+    .floating-theme { position: absolute; top: 20px; right: 20px; z-index: 100; }
+
+    @media (max-width: 900px) {
+        .auth-container { grid-template-columns: 1fr; }
+        .auth-brand-side { display: none; }
+    }
+</style>
+
+<div class="auth-container">
+    
+    <div class="floating-theme">
+        <button class="btn-theme" id="themeToggleDesk"><i class="fas fa-desktop"></i></button>
+    </div>
+
+    <div class="auth-form-side">
+        <a href="{% url 'login' %}" class="text-decoration-none fw-bold small mb-4" style="color: var(--text-muted);">
+            <i class="fas fa-arrow-left me-1"></i> Cancel
+        </a>
+
+        <div style="max-width: 380px; width: 100%; margin: 0 auto;">
+            <h1 class="auth-title">Almost Done!</h1>
+            <p class="auth-subtitle">
+                You are about to sign in with <strong>Google</strong>. Please confirm your username to finish.
+            </p>
+
+            <form method="POST" action="{% url 'socialaccount_signup' %}">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label>{{ field.label }}</label>
+                        <input type="{{ field.field.widget.input_type }}" 
+                               name="{{ field.name }}" 
+                               value="{{ field.value|default:'' }}" 
+                               class="modern-input"
+                               {% if field.field.required %}required{% endif %}>
+                        
+                        {% if field.errors %}
+                            <div class="text-danger small">{{ field.errors }}</div>
+                        {% endif %}
+                        
+                        {% if field.help_text %}
+                            <div class="small text-muted">{{ field.help_text }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn-submit">Complete Setup</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="auth-brand-side">
+        <div class="brand-content">
+            <h2 class="display-4 fw-bold mb-3">Welcome to the family.</h2>
+            <p class="fs-5 opacity-75 mb-4">Just one last step to verify your identity and secure your account.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'talents/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    /* CONTRACT PAPER STYLE */
+    .contract-paper {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 60px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+    }
+    
+    .status-stamp {
+        position: absolute; top: 40px; right: 40px;
+        font-size: 1.2rem; font-weight: 800; text-transform: uppercase;
+        padding: 10px 20px; border-radius: 8px; border: 3px solid;
+        transform: rotate(-10deg); opacity: 0.8;
+    }
+    .stamp-active { color: #10b981; border-color: #10b981; }
+    .stamp-completed { color: #6366f1; border-color: #6366f1; }
+
+    .contract-label {
+        font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;
+        color: var(--text-muted); font-weight: 700; margin-bottom: 5px;
+    }
+    .contract-value {
+        font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin-bottom: 25px;
+    }
+</style>
+
+<div class="container py-5">
+    
+    <div class="text-center mb-4">
+        <h6 class="text-uppercase text-muted fw-bold">Official Agreement</h6>
+        <h2 class="fw-bold" style="color: var(--text-main)">Contract #{{ contract.id }}</h2>
+    </div>
+
+    <div class="contract-paper">
+        
+        {% if contract.status == 'active' %}
+            <div class="status-stamp stamp-active">Active</div>
+        {% else %}
+            <div class="status-stamp stamp-completed">Completed</div>
+        {% endif %}
+
+        <div class="text-center mb-5 pb-4 border-bottom" style="border-color: var(--border-color)!important;">
+            <h1 class="display-5 fw-bold mb-2">{{ contract.job.title }}</h1>
+            <p class="text-muted">Created on {{ contract.start_date|date:"F d, Y" }}</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="contract-label">Client</div>
+                <div class="contract-value d-flex align-items-center">
+                    <img src="{{ contract.client.profile.profile_pic.url }}" class="rounded-circle me-2" style="width:30px; height:30px;">
+                    {{ contract.client.get_full_name }}
+                </div>
+                
+                <div class="contract-label">Start Date</div>
+                <div class="contract-value">{{ contract.start_date|date:"M d, Y" }}</div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="contract-label">Freelancer</div>
+                <div class="contract-value d-flex align-items-center">
+                    <img src="{{ contract.freelancer.profile.profile_pic.url }}" class="rounded-circle me-2" style="width:30px; height:30px;">
+                    {{ contract.freelancer.get_full_name }}
+                </div>
+
+                <div class="contract-label">Total Agreed Price</div>
+                <div class="contract-value text-success fs-4">${{ contract.agreed_price }}</div>
+            </div>
+        </div>
+
+        <div class="mt-4 p-4 rounded-3 bg-light border">
+            <div class="contract-label mb-2">Scope of Work (From Proposal)</div>
+            <p class="text-muted small mb-0">{{ contract.proposal.cover_letter }}</p>
+        </div>
+
+        <div class="mt-5 text-center">
+            {% if contract.status == 'active' %}
+                {% if request.user == contract.client %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button type="submit" name="end_contract" class="btn btn-dark rounded-pill px-5 py-3 fw-bold shadow-lg">
+                            <i class="fas fa-check-circle me-2"></i> Mark Job as Completed
+                        </button>
+                    </form>
+                    <p class="text-muted small mt-2">This will close the contract and record the payment.</p>
+                {% else %}
+                    <button class="btn btn-outline-secondary rounded-pill px-4 disabled">
+                        Waiting for Client to End Contract
+                    </button>
+                {% endif %}
+            {% else %}
+                <button class="btn btn-success rounded-pill px-5 py-3 fw-bold disabled">
+                    <i class="fas fa-check-double me-2"></i> Contract Fulfilled
+                </button>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

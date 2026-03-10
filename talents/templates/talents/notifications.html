@@ -1,130 +1,181 @@
 {% extends 'talents/base.html' %}
+{% load static %}
+{% load humanize %}
 
 {% block content %}
+
 <style>
-    /* Custom Animations & Styles for Notifications */
+    /* --- THEME ENGINE --- */
+    
+    /* 1. LIGHT MODE */
+    :root {
+        --bg-body: #f8fafc;
+        --card-bg: #ffffff;
+        --card-border: #e2e8f0;
+        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --accent: #4f46e5;
+        
+        --unread-bg: #eff6ff; /* Light Blue tint */
+        --icon-bg-default: #f1f5f9;
+    }
+
+    /* 2. DARK MODES */
+    [data-theme="dim"], [data-theme="lights-out"] {
+        --bg-body: #000000;
+        --card-bg: #121212;
+        --card-border: #333333;
+        --card-shadow: none;
+        
+        --text-main: #ffffff;
+        --text-muted: #cbd5e1;
+        --accent: #818cf8;
+        
+        --unread-bg: #1e1b4b; /* Dark Blue tint */
+        --icon-bg-default: #1e1e1e;
+    }
+
+    body { background-color: var(--bg-body); }
+
+    /* --- COMPONENTS --- */
+    .page-container { max-width: 800px; margin: 0 auto; }
+
     .notif-card {
-        border: none;
-        border-radius: 15px;
-        transition: all 0.3s ease;
-        background: #fff;
-        margin-bottom: 15px;
-        position: relative;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
         overflow: hidden;
+        box-shadow: var(--card-shadow);
     }
 
-    .notif-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    .notif-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid var(--card-border);
+        display: flex; justify-content: space-between; align-items: center;
     }
 
-    /* Unread Styling: Purple border + light background */
-    .notif-card.unread {
-        background: #f8f9fe; /* Very light blue/purple tint */
-        border-left: 5px solid #667eea;
+    .notif-item {
+        padding: 20px 25px;
+        border-bottom: 1px solid var(--card-border);
+        display: flex; gap: 20px;
+        transition: 0.2s; position: relative;
+        text-decoration: none; color: inherit;
+    }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item:hover { background: rgba(129, 140, 248, 0.05); }
+
+    /* Unread State */
+    .notif-item.unread { background: var(--unread-bg); }
+    .notif-item.unread::before {
+        content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+        width: 4px; background: var(--accent);
     }
 
-    /* Read Styling: Simple gray border */
-    .notif-card.read {
-        border-left: 5px solid #e2e8f0;
-        opacity: 0.85; /* Slightly faded to show it is "done" */
-    }
-
+    /* Icons */
     .notif-icon-box {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
+        width: 45px; height: 45px; border-radius: 12px;
+        background: var(--icon-bg-default); color: var(--text-muted);
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; font-size: 1.1rem;
+        border: 1px solid var(--card-border);
     }
 
-    .empty-state-icon {
-        width: 80px;
-        height: 80px;
-        background: #f3f4f6;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 20px;
-        color: #9ca3af;
+    /* Specific Icon Colors */
+    .icon-message { color: #3b82f6; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); }
+    .icon-job { color: #10b981; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); }
+    .icon-alert { color: #f59e0b; background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2); }
+
+    /* Content */
+    .notif-content { flex: 1; }
+    .notif-text { font-size: 0.95rem; color: var(--text-main); margin-bottom: 4px; line-height: 1.5; }
+    .notif-time { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+
+    /* Empty State */
+    .empty-state { padding: 60px 20px; text-center; }
+    .empty-icon {
+        width: 80px; height: 80px; border-radius: 50%;
+        background: var(--icon-bg-default); color: var(--text-muted);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 20px; font-size: 2rem;
+        border: 2px dashed var(--card-border);
     }
+
+    .btn-mark-read {
+        font-size: 0.85rem; font-weight: 700; color: var(--accent);
+        text-decoration: none; padding: 6px 12px; border-radius: 8px;
+        background: rgba(79, 70, 229, 0.1); transition: 0.2s;
+    }
+    .btn-mark-read:hover { background: var(--accent); color: white; }
+
 </style>
 
 <div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
+    <div class="page-container">
+        
+        <div class="notif-card">
             
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="fw-bold text-dark mb-0">Notifications</h2>
-                    <p class="text-muted small mb-0">Stay updated with your latest activity</p>
-                </div>
-                <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm text-muted">
-                    <i class="fas fa-check-double me-2"></i>Mark all read
-                </button>
+            <div class="notif-header">
+                <h4 class="fw-bold mb-0" style="color: var(--text-main)">Notifications</h4>
+                {% if notifications %}
+                <a href="#" class="btn-mark-read">Mark all read</a>
+                {% endif %}
             </div>
 
-            <div class="notification-list">
-                {% for notification in notifications %}
-                    <div class="card notif-card shadow-sm p-3 {% if not notification.is_read %}unread{% else %}read{% endif %}">
-                        <div class="d-flex align-items-center">
-                            
-                            <div class="notif-icon-box me-3 
-                                {% if 'Application' in notification.message %}bg-success bg-opacity-10 text-success
-                                {% elif 'subscribed' in notification.message %}bg-primary bg-opacity-10 text-primary
-                                {% else %}bg-warning bg-opacity-10 text-warning{% endif %}">
-                                
-                                {% if 'Application' in notification.message %}
-                                    <i class="fas fa-briefcase fa-lg"></i>
-                                {% elif 'subscribed' in notification.message %}
-                                    <i class="fas fa-envelope fa-lg"></i>
-                                {% else %}
-                                    <i class="fas fa-bell fa-lg"></i>
-                                {% endif %}
-                            </div>
-
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <h6 class="mb-1 text-dark fw-bold">
-                                        {% if 'Application' in notification.message %}New Job Application
-                                        {% elif 'subscribed' in notification.message %}Newsletter Update
-                                        {% else %}System Alert{% endif %}
-                                    </h6>
-                                    <small class="text-muted" style="font-size: 0.75rem;">
-                                        {{ notification.created_at|timesince }} ago
-                                    </small>
-                                </div>
-                                <p class="mb-0 text-secondary small" style="line-height: 1.5;">
-                                    {{ notification.message }}
-                                </p>
-                            </div>
-
-                            {% if not notification.is_read %}
-                                <div class="ms-3">
-                                    <span class="d-inline-block bg-danger rounded-circle shadow-sm" style="width: 10px; height: 10px;"></span>
-                                </div>
-                            {% endif %}
-                        </div>
+            <div class="notif-list">
+                {% for n in notifications %}
+                
+                <a href="#" class="notif-item {% if not n.read %}unread{% endif %}">
+                    
+                    <div class="notif-icon-box {% if 'message' in n.verb %}icon-message{% elif 'offer' in n.verb %}icon-job{% elif 'alert' in n.verb %}icon-alert{% endif %}">
+                        {% if 'message' in n.verb %}
+                            <i class="fas fa-comment-alt"></i>
+                        {% elif 'offer' in n.verb or 'hired' in n.verb %}
+                            <i class="fas fa-briefcase"></i>
+                        {% elif 'security' in n.verb %}
+                            <i class="fas fa-shield-alt"></i>
+                        {% else %}
+                            <i class="fas fa-bell"></i>
+                        {% endif %}
                     </div>
+
+                    <div class="notif-content">
+                        <div class="notif-text">
+                            {{ n.description|default:n.verb|safe }}
+                        </div>
+                        <div class="notif-time">{{ n.timestamp|timesince }} ago</div>
+                    </div>
+
+                    {% if not n.read %}
+                    <div class="d-flex align-items-center">
+                        <div style="width: 10px; height: 10px; background: var(--accent); border-radius: 50%;"></div>
+                    </div>
+                    {% endif %}
+                </a>
 
                 {% empty %}
-                    <div class="text-center py-5">
-                        <div class="empty-state-icon shadow-sm">
-                            <i class="far fa-bell-slash fa-2x"></i>
-                        </div>
-                        <h5 class="fw-bold text-dark">No notifications yet</h5>
-                        <p class="text-muted small">When you get job offers or updates, they will appear here.</p>
-                        <a href="{% url 'dashboard' %}" class="btn btn-primary rounded-pill px-4 mt-2">
-                            Go to Dashboard
-                        </a>
+                
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="far fa-bell-slash"></i>
                     </div>
+                    <h5 class="fw-bold" style="color: var(--text-main)">All caught up!</h5>
+                    <p style="color: var(--text-muted)">You have no new notifications at the moment.</p>
+                </div>
+
                 {% endfor %}
             </div>
 
+            {% if notifications %}
+            <div class="p-3 text-center border-top" style="border-color: var(--card-border) !important;">
+                <a href="#" class="small fw-bold text-decoration-none" style="color: var(--text-muted)">View Older Notifications</a>
+            </div>
+            {% endif %}
+
         </div>
+
     </div>
 </div>
+
 {% endblock %}

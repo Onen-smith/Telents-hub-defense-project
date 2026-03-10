@@ -3,214 +3,232 @@
 {% block content %}
 
 <style>
-    /* Page Header */
-    .contact-header {
-        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-        color: white;
-        padding: 80px 0 100px; /* Extra padding at bottom for overlap */
+    /* --- PAGE STYLING --- */
+    
+    /* 1. Corporate Header */
+    .support-header {
+        background: var(--bg-body);
+        padding: 60px 0 40px;
         text-align: center;
-        margin-bottom: -50px; /* Pulls the content up */
+        border-bottom: 1px solid var(--border-color);
     }
 
-    /* The Main Card */
-    .contact-wrapper {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        overflow: hidden;
+    /* 2. Main Layout */
+    .contact-container {
+        max-width: 1100px;
+        margin: 0 auto;
     }
 
-    /* Left Side: Info (Dark) */
-    .contact-info-side {
-        background: #1a1a1a;
-        color: white;
-        padding: 50px;
-        height: 100%;
+    /* 3. The "Ticket" Form Card */
+    .ticket-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     }
 
-    .info-item {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 30px;
-    }
-    .info-icon {
-        background: rgba(255,255,255,0.1);
-        width: 50px; height: 50px;
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        margin-right: 20px;
-        font-size: 1.2rem;
-        flex-shrink: 0;
-    }
-
-    /* Right Side: Form (Light) */
-    .contact-form-side {
-        padding: 50px;
-    }
-
+    /* 4. Professional Inputs (Fixed Visibility) */
     .form-label {
-        font-weight: 600;
-        font-size: 0.85rem;
+        font-weight: 700;
+        font-size: 0.8rem;
         text-transform: uppercase;
-        color: #666;
+        color: var(--text-muted);
+        letter-spacing: 0.5px;
         margin-bottom: 8px;
     }
     
-    .custom-input {
-        background-color: #f8f9fa;
-        border: 1px solid #e9ecef;
-        padding: 15px;
+    .corp-input {
+        background-color: var(--bg-body) !important; /* Distinct from card */
+        border: 1px solid var(--border-color);
+        color: var(--text-main) !important; /* FORCE VISIBLE TEXT */
+        padding: 14px 18px;
         border-radius: 8px;
-        transition: all 0.3s;
+        font-size: 1rem;
+        transition: all 0.2s;
     }
-    .custom-input:focus {
-        background-color: white;
-        border-color: #333;
-        box-shadow: none;
+    
+    .corp-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        background-color: var(--bg-body) !important;
+        color: var(--text-main) !important;
+    }
+    
+    /* Fix Placeholder Visibility */
+    .corp-input::placeholder {
+        color: var(--text-muted);
+        opacity: 0.7;
     }
 
-    /* Map Section */
-    .map-container {
-        width: 100%;
-        height: 250px;
-        border-radius: 10px;
-        overflow: hidden;
-        margin-top: 30px;
-        filter: grayscale(100%); /* Makes map look classy/black & white */
-        transition: filter 0.3s;
+    /* 5. Sidebar Info Cards */
+    .info-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: start;
+        transition: transform 0.2s;
     }
-    .map-container:hover {
-        filter: grayscale(0%);
+    .info-card:hover {
+        transform: translateY(-3px);
+        border-color: var(--accent);
+    }
+    .info-icon-box {
+        width: 45px; height: 45px;
+        background: rgba(37, 99, 235, 0.1);
+        color: var(--accent);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+
+    /* 6. FAQ Accordion Override */
+    .accordion-item {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+    }
+    .accordion-button {
+        background-color: var(--card-bg);
+        color: var(--text-main);
+        font-weight: 600;
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(37, 99, 235, 0.05);
+        color: var(--accent);
+        box-shadow: none;
+    }
+    .accordion-body {
+        color: var(--text-muted);
     }
 </style>
 
-<div class="contact-header">
+<div class="support-header">
     <div class="container">
-        <h1 class="fw-bold display-5">Get in touch</h1>
-        <p class="lead text-white-50">Have a question or want to work together? We'd love to hear from you.</p>
+        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-3 fw-bold border border-primary border-opacity-25">
+            Support Center
+        </span>
+        <h1 class="fw-bold display-5 mb-2" style="color: var(--text-main);">How can we help?</h1>
+        <p class="text-muted" style="max-width: 600px; margin: 0 auto;">
+            Our team is available Mon-Fri, 9am to 5pm WAT. Submit a ticket below and we'll get back to you within 24 hours.
+        </p>
     </div>
 </div>
 
-<div class="container pb-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            
-            <div class="contact-wrapper">
-                <div class="row g-0">
+<div class="container py-5 contact-container">
+    <div class="row g-5">
+        
+        <div class="col-lg-8">
+            <div class="ticket-card">
+                <h4 class="fw-bold mb-4" style="color: var(--text-main);">Submit a Request</h4>
+                
+                <form method="POST">
+                    {% csrf_token %}
                     
-                    <div class="col-lg-5">
-                        <div class="contact-info-side">
-                            <h4 class="fw-bold mb-4">Contact Information</h4>
-                            <p class="text-white-50 mb-5 small">Fill up the form and our Team will get back to you within 24 hours.</p>
-
-                            <div class="info-item">
-                                <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
-                                <div>
-                                    <h6 class="fw-bold mb-1">Phone</h6>
-                                    <p class="mb-0 text-white-50 small">+234 800 123 4567</p>
-                                    <p class="mb-0 text-white-50 small">+234 800 987 6543</p>
-                                </div>
-                            </div>
-
-                            <div class="info-item">
-                                <div class="info-icon"><i class="fas fa-envelope"></i></div>
-                                <div>
-                                    <h6 class="fw-bold mb-1">Email</h6>
-                                    <p class="mb-0 text-white-50 small">support@talenthub.com</p>
-                                    <p class="mb-0 text-white-50 small">careers@talenthub.com</p>
-                                </div>
-                            </div>
-
-                            <div class="info-item">
-                                <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
-                                <div>
-                                    <h6 class="fw-bold mb-1">Office Address</h6>
-                                    <p class="mb-0 text-white-50 small">123 Innovation Drive,<br>Tech Hub, Lagos State.</p>
-                                </div>
-                            </div>
-
-                            <div class="map-container">
-                                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.52843477033!2d3.3769!3d6.4545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8b2ae68280c1%3A0xdc9e87a367c3d9cb!2sLagos!5e0!3m2!1sen!2sng!4v1600000000000!5m2!1sen!2sng" 
-                                width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-                            </div>
-
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="name" class="form-control corp-input" placeholder="e.g. Emmanuel Onen" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" name="email" class="form-control corp-input" placeholder="name@company.com" required>
                         </div>
                     </div>
 
-                    <div class="col-lg-7">
-                        <div class="contact-form-side">
-                            <h3 class="fw-bold mb-4" style="color: #222;">Send us a message</h3>
-                            
-                            <form method="POST">
-                                {% csrf_token %}
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Your Name</label>
-                                        <input type="text" name="name" class="form-control custom-input" placeholder="John Doe" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Email Address</label>
-                                        <input type="email" name="email" class="form-control custom-input" placeholder="john@example.com" required>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">Subject</label>
-                                    <input type="text" name="subject" class="form-control custom-input" placeholder="Project Inquiry..." required>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="form-label">Message</label>
-                                    <textarea name="message" rows="5" class="form-control custom-input" placeholder="Tell us about your project..." required></textarea>
-                                </div>
-
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-dark btn-lg py-3">Send Message</button>
-                                </div>
-                            </form>
-
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Department</label>
+                        <select class="form-select corp-input" style="cursor: pointer;">
+                            <option>General Inquiry</option>
+                            <option>Technical Support</option>
+                            <option>Billing & Payments</option>
+                            <option>Report a User / Safety</option>
+                        </select>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+                        <input type="text" name="subject" class="form-control corp-input" placeholder="Brief summary of issue..." required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Message Details</label>
+                        <textarea name="message" rows="6" class="form-control corp-input" placeholder="Please describe your issue in detail..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow-sm">
+                        Submit Ticket
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            
+            <h6 class="fw-bold text-uppercase text-muted small mb-3">Direct Contact</h6>
+            
+            <div class="info-card">
+                <div class="info-icon-box"><i class="fas fa-envelope-open-text"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-1" style="color: var(--text-main);">Email Us</h6>
+                    <p class="mb-0 small text-muted">support@talenthub.com</p>
+                    <p class="mb-0 small text-muted">sales@talenthub.com</p>
                 </div>
             </div>
 
-        </div>
-    </div>
-</div>
+            <div class="info-card">
+                <div class="info-icon-box"><i class="fas fa-headset"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-1" style="color: var(--text-main);">Call Support</h6>
+                    <p class="mb-0 small text-muted">+234 800 123 4567</p>
+                    <p class="mb-0 small text-muted">Mon-Fri, 9am-5pm</p>
+                </div>
+            </div>
 
-<div class="container pb-5">
-    <div class="text-center mb-5">
-        <h3 class="fw-bold">Frequently Asked Questions</h3>
-    </div>
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="accordion shadow-sm" id="faqAccordion">
-                <div class="accordion-item border-0 mb-3 rounded overflow-hidden">
+            <div class="info-card">
+                <div class="info-icon-box"><i class="fas fa-map-marked-alt"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-1" style="color: var(--text-main);">Visit HQ</h6>
+                    <p class="mb-0 small text-muted">123 Innovation Drive,<br>Lagos State, Nigeria.</p>
+                </div>
+            </div>
+
+            <hr class="my-5" style="border-color: var(--border-color);">
+
+            <h6 class="fw-bold text-uppercase text-muted small mb-3">Common Questions</h6>
+            
+            <div class="accordion accordion-flush" id="faqAccordion">
+                <div class="accordion-item rounded-3 mb-2 border">
                     <h2 class="accordion-header">
-                        <button class="accordion-button collapsed bg-light text-dark fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                            How do I get verified?
+                        <button class="accordion-button collapsed rounded-3" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            How do I hire a freelancer?
                         </button>
                     </h2>
                     <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Upload your profile picture and complete your bio. Our admin team reviews profiles within 24 hours.
+                        <div class="accordion-body small">
+                            Post a job, review proposals from verified talents, and click "Hire" to start a secure contract.
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item border-0 mb-3 rounded overflow-hidden">
+
+                <div class="accordion-item rounded-3 mb-2 border">
                     <h2 class="accordion-header">
-                        <button class="accordion-button collapsed bg-light text-dark fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                            Is this service free?
+                        <button class="accordion-button collapsed rounded-3" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            Is my payment secure?
                         </button>
                     </h2>
                     <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Yes! Browsing talents is 100% free. Talents can create a standard profile for free.
+                        <div class="accordion-body small">
+                            Yes. We use an Escrow system. Funds are only released to the freelancer when you approve the work.
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>

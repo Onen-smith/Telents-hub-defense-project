@@ -1,0 +1,32 @@
+{% extends 'talents/base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm p-4 border-0 rounded-4">
+                <h3 class="fw-bold mb-3">Submit Proposal</h3>
+                <h5 class="text-muted mb-4">Job: {{ job.title }}</h5>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="fw-bold small text-muted">YOUR BID ($)</label>
+                        {{ form.bid_amount }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold small text-muted">DAYS TO COMPLETE</label>
+                        {{ form.estimated_days }}
+                    </div>
+                    <div class="mb-4">
+                        <label class="fw-bold small text-muted">COVER LETTER</label>
+                        {{ form.cover_letter }}
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary fw-bold py-3 rounded-pill">Send Proposal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
