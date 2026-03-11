@@ -124,13 +124,13 @@
         </div>
 
         <h1 class="fw-bold mt-3 mb-1">{{ profile_user.first_name }} {{ profile_user.last_name }}</h1>
-        <div class="fs-5 mb-2" style="color: var(--accent)">{{ profile_user.profile.title|default:"Freelancer" }}</div>
+        <div class="fs-5 mb-2" style="color: var(--accent)">{{ profile_user.profile.headline|default:"Freelancer" }}</div>
         <div class="small text-muted mb-4">@{{ profile_user.username }} • {{ profile_user.profile.location|default:"Remote" }}</div>
 
         <div class="d-flex justify-content-center gap-3">
             {% if request.user != profile_user %}
 
-                <a href="{% url 'post_job' %}" class="btn-hire shadow-lg">
+                <a href="{% url 'hire_freelancer' profile_user.id %}" class="btn-hire shadow-lg">
                     Hire Talent
                 </a>
 
@@ -146,7 +146,7 @@
 
     <div class="stats-bar">
         <div class="stat-item">
-            <span class="stat-num">${{ profile_user.profile.hourly_rate|default:"0" }}</span>
+            <span class="stat-num">₦{{ profile_user.profile.hourly_rate|default:"0" }}</span>
             <span class="stat-lbl">Hourly Rate</span>
         </div>
         <div class="stat-item">

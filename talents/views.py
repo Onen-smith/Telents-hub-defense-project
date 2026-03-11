@@ -23,7 +23,7 @@ import requests
 
 
 # Local Imports
-from .models import Profile, Review, ContactMessage, SavedJob, Subscriber, BlogPost, Notification, Skill, Job, Proposal, Contract, Message
+from .models import Profile, Review, ContactMessage, SavedJob, Subscriber, BlogPost, Notification, Skill, Job, Proposal, Contract, Message, Conversation
 from .forms import (
     CustomUserCreationForm, 
     UserUpdateForm, 
@@ -521,8 +521,7 @@ def create_contract(request, proposal_id):
         client=request.user,
         freelancer=proposal.freelancer,
         proposal=proposal,
-        amount=amount,  # Ensure your Contract model has an 'amount' field
-        agreed_price=amount,  # Or 'agreed_price', depending on your model
+        agreed_price=amount,
         status='active'
     )
 
@@ -556,12 +555,34 @@ def contract_detail(request, pk):
         messages.error(request, "Access denied.")
         return redirect('dashboard')
 
-    if request.method == 'POST' and 'end_contract' in request.POST:
-        if request.user == contract.client:
+    if request.method == 'POST' and 'release_funds' in request.POST:
+        if request.user == contract.client and contract.status == 'active':
+            # 1. Update contract status
             contract.status = 'completed'
             contract.end_date = timezone.now()
             contract.save()
-            messages.success(request, "Contract marked as completed!")
+
+            # 2. Release funds from escrow for the client
+            Transaction.objects.create(
+                user=contract.client,
+                amount=-contract.agreed_price,
+                transaction_type='escrow_release',
+                status='success',
+                contract=contract,
+                reference=f"RELEASE-{contract.id}-{secrets.token_hex(4)}"
+            )
+
+            # 3. Add funds to the freelancer's wallet
+            Transaction.objects.create(
+                user=contract.freelancer,
+                amount=contract.agreed_price,
+                transaction_type='fund_received',
+                status='success',
+                contract=contract,
+                reference=f"PAYOUT-{contract.id}-{secrets.token_hex(4)}"
+            )
+
+            messages.success(request, f"Funds released to {contract.freelancer.username} successfully!")
             return redirect('contract_detail', pk=pk)
 
     return render(request, 'talents/contract_detail.html', {'contract': contract})
@@ -580,36 +601,10 @@ def notifications(request):
 
 @login_required
 def inbox(request):
-    # 1. Find all users I have exchanged messages with
-    # We get all messages where I am sender OR recipient
-    messages = Message.objects.filter(
-        Q(sender=request.user) | Q(recipient=request.user)
-    )
-    
-    # 2. Extract unique users from those messages
-    # We use a set to avoid duplicates
-    active_conversations = set()
-    for m in messages:
-        if m.sender != request.user:
-            active_conversations.add(m.sender)
-        if m.recipient != request.user:
-            active_conversations.add(m.recipient)
-            
-    # 3. For each user, get the last message (for the preview text)
-    conversations = []
-    for user in active_conversations:
-        last_msg = Message.objects.filter(
-            Q(sender=request.user, recipient=user) | 
-            Q(sender=user, recipient=request.user)
-        ).latest('timestamp')
-        
-        conversations.append({
-            'user': user,
-            'last_message': last_msg
-        })
-    
-    # Sort conversations by newest message first
-    conversations.sort(key=lambda x: x['last_message'].timestamp, reverse=True)
+    # Find all conversations the user is a participant in
+    conversations = Conversation.objects.filter(participants=request.user).annotate(
+        last_message_time=Max('messages__created_at')
+    ).order_by('-last_message_time')
 
     context = {
         'conversations': conversations
@@ -620,47 +615,36 @@ def inbox(request):
 def chat_detail(request, username):
     other_user = get_object_or_404(User, username=username)
     
-    # 1. Mark all messages from them as read
-    Message.objects.filter(sender=other_user, recipient=request.user, is_read=False).update(is_read=True)
+    # Try to find an existing conversation or create a new one
+    conversation = Conversation.objects.filter(participants=request.user).filter(participants=other_user).first()
+    if not conversation:
+        conversation = Conversation.objects.create()
+        conversation.participants.add(request.user, other_user)
     
-    # 2. Fetch Chat History
-    messages = Message.objects.filter(
-        Q(sender=request.user, recipient=other_user) | 
-        Q(sender=other_user, recipient=request.user)
-    ).order_by('timestamp')
+    # Handle message sending
+    if request.method == "POST":
+        content = request.POST.get('content')
+        if content:
+            Message.objects.create(
+                conversation=conversation,
+                sender=request.user,
+                recipient=other_user,
+                content=content
+            )
+            return redirect('chat_detail', username=username)
+
+    # Mark messages from the other user as read
+    Message.objects.filter(conversation=conversation, sender=other_user, read_at__isnull=True).update(read_at=timezone.now())
+    
+    # Fetch chat history for this conversation
+    messages = Message.objects.filter(conversation=conversation).order_by('created_at')
     
     context = {
         'other_user': other_user,
-        'chat_messages': messages
+        'chat_messages': messages,
+        'conversation': conversation
     }
-    return render(request, 'talents/inbox.html', context) # Use the same template
-
-@login_required
-def send_message_ajax(request):
-    if request.method == "POST":
-        recipient_username = request.POST.get('recipient')
-        content = request.POST.get('content')
-        
-        if not content:
-            return JsonResponse({'status': 'error', 'message': 'Empty message'})
-            
-        recipient = get_object_or_404(User, username=recipient_username)
-        
-        # Create Message
-        msg = Message.objects.create(
-            sender=request.user,
-            recipient=recipient,
-            content=content
-        )
-        
-        # Return success with timestamp for the UI
-        return JsonResponse({
-            'status': 'success',
-            'timestamp': msg.timestamp.strftime("%H:%M"),
-            'content': msg.content
-        })
-        
-    return JsonResponse({'status': 'error'})
+    return render(request, 'talents/inbox.html', context)
 
 @login_required
 def post_job(request):
@@ -684,8 +668,8 @@ def post_job(request):
                         job.skills_required.add(skill)
             else:
                 form.save_m2m() # Fallback to standard handling
-            
-            messages.success(request, "Job posted successfully!")
+
+            messages.success(request, "Job updated successfully!")
             return redirect('job_list')
     else:
         form = JobForm()
@@ -874,8 +858,11 @@ def edit_job(request, slug):
                 for skill_name in skills_input.split(','):
                     skill_name = skill_name.strip()
                     if skill_name:
+                        # Get or Create the skill instantly
                         skill, _ = Skill.objects.get_or_create(name__iexact=skill_name, defaults={'name': skill_name})
                         job.skills_required.add(skill)
+            else:
+                form.save_m2m() # Fallback to standard handling
 
             messages.success(request, "Job updated successfully!")
             return redirect('job_detail', slug=job.slug)
@@ -888,3 +875,27 @@ def edit_job(request, slug):
         'form': form,
         'title': 'Edit Job'  # Pass a title variable
     })
+
+@login_required
+def hire_freelancer(request, freelancer_id):
+    freelancer = get_object_or_404(User, id=freelancer_id)
+    client_jobs = Job.objects.filter(client=request.user, is_active=True)
+
+    if request.method == 'POST':
+        job_id = request.POST.get('job_id')
+        job = get_object_or_404(Job, id=job_id, client=request.user)
+        
+        # Create a proposal on behalf of the client
+        proposal, created = Proposal.objects.get_or_create(
+            job=job,
+            freelancer=freelancer,
+            defaults={'bid_amount': job.budget, 'cover_letter': 'Hired directly by client.'}
+        )
+        
+        return redirect('create_contract', proposal_id=proposal.id)
+
+    context = {
+        'freelancer': freelancer,
+        'client_jobs': client_jobs,
+    }
+    return render(request, 'talents/hire_freelancer.html', context)

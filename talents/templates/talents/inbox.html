@@ -1,10 +1,5 @@
 {% extends 'talents/base.html' %}
 {% load static %}
-{% load socialaccount %}
-
-{% block navbar %}{% endblock %}
-{% block mobile_nav %}{% endblock %}
-{% block footer %}{% endblock %}
 
 {% block content %}
 
@@ -19,7 +14,7 @@
         display: flex;
         overflow: hidden;
         position: relative;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.3); /* Stronger shadow for depth */
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
     }
 
     /* --- 1. LEFT SIDEBAR (Chat List) --- */
@@ -28,7 +23,7 @@
         border-right: 1px solid var(--border);
         display: flex; flex-direction: column;
         flex-shrink: 0;
-        background: var(--bg-surface); /* Slightly lighter than body */
+        background: var(--bg-surface);
         z-index: 5;
     }
 
@@ -36,71 +31,58 @@
     .chat-main {
         flex: 1;
         display: flex; flex-direction: column;
-        background: var(--bg-body); /* Deepest dark color */
+        background: var(--bg-body);
         position: relative;
         min-width: 0;
     }
 
-    /* --- 3. RIGHT SIDEBAR (Chat Details) --- */
-    .chat-info-sidebar {
-        width: 320px;
-        border-left: 1px solid var(--border);
-        background: var(--bg-surface);
-        display: flex; flex-direction: column;
-        margin-right: -320px; /* Hidden by default */
-        transition: margin-right 0.3s ease;
-        z-index: 10;
-    }
-    .chat-info-sidebar.open { margin-right: 0; }
-
-    /* --- HIGH VISIBILITY COMPONENTS --- */
-    
     /* Search Bar */
     .search-wrapper { padding: 15px; border-bottom: 1px solid var(--border); }
     .search-bar {
-        background: rgba(0,0,0,0.2); /* Darker background for contrast */
+        background: rgba(0,0,0,0.2);
         border: 1px solid var(--border);
         padding: 12px; border-radius: 8px; width: 100%; 
         color: var(--text-main); 
         font-weight: 500; outline: none;
     }
-    .search-bar::placeholder { color: var(--text-muted); opacity: 0.7; }
-    .search-bar:focus { border-color: var(--primary); background: rgba(0,0,0,0.3); }
-    
+
     /* Chat Items */
     .chat-item {
         padding: 15px; display: flex; gap: 12px; cursor: pointer;
         border-bottom: 1px solid var(--border);
         transition: 0.2s;
+        text-decoration: none;
+        color: inherit;
     }
     .chat-item:hover { background: rgba(255,255,255,0.03); }
     .chat-item.active { 
         background: rgba(139, 92, 246, 0.1); 
         border-left: 4px solid var(--primary); 
     }
-    .chat-item h6 { color: var(--text-main); font-weight: 700; }
-    .chat-item p { color: var(--text-muted); opacity: 0.9; } /* Boosted opacity */
+    .chat-item h6 { color: var(--text-main); font-weight: 700; margin-bottom: 0; }
+    .chat-item p { color: var(--text-muted); opacity: 0.9; margin-bottom: 0; }
 
     /* Messages */
     .msg-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
 
-    .bubble { max-width: 75%; padding: 14px 18px; border-radius: 18px; font-size: 0.95rem; line-height: 1.5; position: relative; }
+    .bubble { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 0.95rem; line-height: 1.5; position: relative; }
     
     .bubble.them { 
-        background: var(--bg-surface); 
+        align-self: flex-start;
+        background: var(--bg-surface);
         border: 1px solid var(--border); 
         color: var(--text-main); 
         border-bottom-left-radius: 2px;
     }
     
     .bubble.me { 
-        background: var(--primary); 
-        color: white; /* Always white text on primary color */
+        align-self: flex-end;
+        background: var(--primary);
+        color: white;
         border-bottom-right-radius: 2px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     
-    .msg-time { font-size: 0.7rem; margin-top: 5px; opacity: 0.7; display: block; text-align: right; }
+    .msg-time { font-size: 0.7rem; margin-top: 5px; opacity: 0.7; display: block; }
 
     /* Input Area */
     .chat-input-wrapper {
@@ -108,214 +90,89 @@
         background: var(--bg-surface); 
         border-top: 1px solid var(--border);
     }
-    .chat-input {
-        background: var(--bg-body); 
-        border: 1px solid var(--border); 
-        color: var(--text-main);
-        padding: 12px 20px;
-    }
-    .chat-input:focus { border-color: var(--primary); }
-
-    /* Icons */
-    .btn-icon { 
-        color: var(--text-muted); 
-        font-size: 1.2rem; width: 40px; height: 40px; 
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 50%; transition: 0.2s; border: none; background: transparent;
-    }
-    .btn-icon:hover { background: rgba(255,255,255,0.1); color: var(--text-main); }
-
-    /* Info Panel */
-    .info-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--border); }
-    .info-section { padding: 20px; border-bottom: 1px solid var(--border); }
-    
-    .action-row { 
-        display: flex; justify-content: space-between; align-items: center; 
-        padding: 12px 10px; cursor: pointer; border-radius: 8px;
-        color: var(--text-main); 
-    }
-    .action-row:hover { background: rgba(255,255,255,0.03); }
-    .action-icon { width: 30px; text-align: center; font-size: 1.1rem; }
-
-    /* Toggle Switch (High Contrast) */
-    .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { 
-        position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; 
-        background-color: rgba(255,255,255,0.2); /* Visible grey when off */
-        transition: .4s; border-radius: 34px; 
-    }
-    .slider:before { 
-        position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; 
-        background-color: white; transition: .4s; border-radius: 50%; 
-    }
-    input:checked + .slider { background-color: var(--primary); }
-    input:checked + .slider:before { transform: translateX(18px); }
-
-    /* Responsive */
-    @media (max-width: 992px) {
-        .chat-info-sidebar { position: absolute; right: 0; height: 100%; z-index: 20; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
-    }
-    @media (max-width: 768px) {
-        .inbox-wrapper { border: none; border-radius: 0; height: calc(100vh - 130px); }
-        .chat-list-sidebar { width: 100%; }
-        .chat-main { display: none; }
-        .inbox-wrapper.chat-active .chat-list-sidebar { display: none; }
-        .inbox-wrapper.chat-active .chat-main { display: flex; }
-    }
 </style>
 
 <div class="container-fluid px-0 px-md-4">
-    <div class="inbox-wrapper" id="inboxWrapper">
+    <div class="inbox-wrapper">
         
+        <!-- Sidebar -->
         <div class="chat-list-sidebar">
             <div class="search-wrapper">
                 <input type="text" class="search-bar" placeholder="Search messages...">
             </div>
             
             <div style="overflow-y: auto; flex: 1;">
-                <div class="chat-item active" onclick="openChat()">
-                    <img src="https://ui-avatars.com/api/?name=Sarah+J&background=random" style="width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--border);">
-                    <div style="flex: 1; min-width: 0;">
-                        <div class="d-flex justify-content-between mb-1">
-                            <h6 class="mb-0 text-truncate">Sarah Jenkins</h6>
-                            <small style="color: var(--text-muted)">12:30 PM</small>
-                        </div>
-                        <p class="small mb-0 text-truncate">Can you send the final files?</p>
-                    </div>
-                </div>
-                
-                <div class="chat-item">
-                    <img src="https://ui-avatars.com/api/?name=Mike+R&background=0D8ABC&color=fff" style="width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--border);">
-                    <div style="flex: 1; min-width: 0;">
-                        <div class="d-flex justify-content-between mb-1">
-                            <h6 class="mb-0 text-truncate">Mike Ross</h6>
-                            <small style="color: var(--text-muted)">Yesterday</small>
-                        </div>
-                        <p class="small mb-0 text-truncate fw-bold text-success">Offer Accepted!</p>
-                    </div>
-                </div>
+                {% for conv in conversations %}
+                    {# Get the other user in the conversation #}
+                    {% with other_p=conv.participants.all|first %}
+                        {% if other_p == request.user %}
+                            {% with other_p=conv.participants.all|last %}{% endwith %}
+                        {% endif %}
+
+                        <a href="{% url 'chat_detail' other_p.username %}" class="chat-item {% if other_user.username == other_p.username %}active{% endif %}">
+                            <img src="{{ other_p.profile.profile_pic.url }}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;">
+                            <div style="flex: 1; min-width: 0;">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <h6 class="text-truncate">{{ other_p.username }}</h6>
+                                </div>
+                                <p class="small text-truncate">View conversation</p>
+                            </div>
+                        </a>
+                    {% endwith %}
+                {% empty %}
+                    <div class="text-center p-4 text-muted small">No conversations yet.</div>
+                {% endfor %}
             </div>
         </div>
 
-        <div class="chat-main" id="chatMain" style="display: none;">
-            
-            <div class="d-flex justify-content-between align-items-center p-3 border-bottom border-secondary border-opacity-10" style="background: var(--bg-surface);">
-                <div class="d-flex align-items-center gap-3">
-                    <button class="btn btn-sm btn-icon d-md-none" onclick="backToList()"><i class="fas fa-arrow-left"></i></button>
-                    <img src="https://ui-avatars.com/api/?name=Sarah+J&background=random" style="width: 40px; height: 40px; border-radius: 50%;">
-                    <div>
-                        <h6 class="fw-bold mb-0" style="color: var(--text-main)">Sarah Jenkins</h6>
-                        <small class="text-success fw-bold" style="font-size: 0.8rem;">● Online</small>
-                    </div>
-                </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-icon"><i class="fas fa-phone"></i></button>
-                    <button class="btn btn-icon"><i class="fas fa-video"></i></button>
-                    <button class="btn btn-icon" onclick="toggleInfo()"><i class="fas fa-info-circle"></i></button>
-                </div>
-            </div>
-
-            <div class="msg-area">
-                <div class="text-center small text-muted my-3 opacity-75">Today</div>
-                
-                <div class="d-flex mb-3">
-                    <div class="bubble them">
-                        Hi! Any updates on the project?
-                        <span class="msg-time">10:00 AM</span>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-end mb-3">
-                    <div class="bubble me">
-                        Yes, almost done. Uploading now.
-                        <span class="msg-time text-white-50">10:05 AM <i class="fas fa-check"></i></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="chat-input-wrapper">
-                <div class="d-flex gap-2 align-items-center">
-                    <button class="btn btn-icon"><i class="fas fa-paperclip"></i></button>
-                    <input type="text" class="form-control rounded-pill chat-input" placeholder="Type a message...">
-                    <button class="btn btn-primary rounded-circle shadow-sm" style="width: 45px; height: 45px; flex-shrink: 0;"><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </div>
-        </div>
-
-        <div class="chat-info-sidebar" id="infoSidebar">
-            
-            <div class="info-header">
-                <img src="https://ui-avatars.com/api/?name=Sarah+J&background=random" class="shadow-lg mb-3" style="width: 90px; height: 90px; border-radius: 50%; border: 4px solid var(--bg-body);">
-                <h5 class="fw-bold mb-1" style="color: var(--text-main)">Sarah Jenkins</h5>
-                <p class="text-muted small">Senior Product Designer</p>
-                <div class="d-flex justify-content-center gap-3 mt-3">
-                    <a href="{% url 'dashboard' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-4" style="color: var(--text-main); border-color: var(--border);">Profile</a>
-                </div>
-            </div>
-
-            <div class="info-section">
-                <h6 class="small fw-bold text-muted text-uppercase mb-3">Privacy & Settings</h6>
-                
-                <div class="action-row">
+        <!-- Main Chat -->
+        <div class="chat-main">
+            {% if other_user %}
+                <div class="d-flex justify-content-between align-items-center p-3 border-bottom" style="background: var(--bg-surface);">
                     <div class="d-flex align-items-center gap-3">
-                        <i class="fas fa-bell-slash action-icon"></i> 
-                        <span>Mute Notifications</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="action-row text-danger" onclick="alert('Blocked!')">
-                    <div class="d-flex align-items-center gap-3">
-                        <i class="fas fa-ban action-icon text-danger"></i> 
-                        <span class="text-danger">Block User</span>
+                        <img src="{{ other_user.profile.profile_pic.url }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        <h6 class="fw-bold mb-0">{{ other_user.username }}</h6>
                     </div>
                 </div>
 
-                <div class="action-row text-warning" onclick="alert('Reported!')">
-                    <div class="d-flex align-items-center gap-3">
-                        <i class="fas fa-flag action-icon text-warning"></i> 
-                        <span class="text-warning">Report Issue</span>
+                <div class="msg-area" id="chat-log">
+                    {% for msg in chat_messages %}
+                        <div class="bubble {% if msg.sender == request.user %}me{% else %}them{% endif %}">
+                            {{ msg.content }}
+                            <span class="msg-time">{{ msg.created_at|date:"H:i" }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="chat-input-wrapper">
+                    <form id="chat-form" method="POST" class="d-flex gap-2">
+                        {% csrf_token %}
+                        <input type="text" name="content" id="chat-message-input" class="form-control rounded-pill" placeholder="Type a message..." required autocomplete="off">
+                        <button type="submit" class="btn btn-primary rounded-circle" style="width: 45px; height: 45px;"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="h-100 d-flex align-items-center justify-content-center text-muted">
+                    <div class="text-center">
+                        <i class="far fa-comments fa-3x mb-3 opacity-25"></i>
+                        <p>Select a contact to start chatting</p>
                     </div>
                 </div>
-            </div>
-
-            <div class="p-4 mt-auto text-center opacity-50">
-                <i class="fas fa-lock mb-2"></i>
-                <div class="small">Messages are end-to-end encrypted.</div>
-            </div>
+            {% endif %}
         </div>
 
     </div>
 </div>
 
+{% if other_user %}
 <script>
-    const wrapper = document.getElementById('inboxWrapper');
-    const chatMain = document.getElementById('chatMain');
-    const infoSidebar = document.getElementById('infoSidebar');
+    const chatLog = document.getElementById('chat-log');
 
-    function openChat() {
-        if (window.innerWidth < 768) {
-            wrapper.classList.add('chat-active');
-        } else {
-            chatMain.style.display = 'flex';
-        }
+    function scrollToBottom() {
+        chatLog.scrollTop = chatLog.scrollHeight;
     }
-
-    function backToList() {
-        wrapper.classList.remove('chat-active');
-    }
-
-    function toggleInfo() {
-        infoSidebar.classList.toggle('open');
-    }
-
-    if (window.innerWidth >= 768) {
-        chatMain.style.display = 'flex';
-    }
+    scrollToBottom();
 </script>
+{% endif %}
 
 {% endblock %}

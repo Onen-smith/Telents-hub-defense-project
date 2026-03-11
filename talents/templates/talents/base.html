@@ -215,9 +215,9 @@
             </form>
 
             <div class="d-flex align-items-center gap-2">
-                <button class="btn-theme me-2" id="themeToggleDesk" title="Switch Theme"><i class="fas fa-desktop"></i></button>
-
                 {% if user.is_authenticated %}
+                    <!-- Theme switcher moved inside auth block -->
+                    <button class="btn-theme me-2" id="themeToggleDesk" title="Switch Theme"><i class="fas fa-desktop"></i></button>
                     <a href="{% url 'inbox' %}" class="nav-icon-btn"><i class="far fa-comment-alt"></i></a>
                     <a href="{% url 'notifications' %}" class="nav-icon-btn me-2">
                         <i class="far fa-bell"></i>

@@ -14,7 +14,6 @@
         grid-template-columns: 450px 1fr; /* Fixed Left, Fluid Right */
         height: 100vh;
         width: 100vw;
-        overflow: hidden;
         background-color: var(--bg-body);
     }
 
@@ -73,22 +72,15 @@
     }
     .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
 
-    /* FLOATING THEME TOGGLE */
-    .floating-theme { position: absolute; top: 20px; right: 20px; z-index: 100; }
-
     /* MOBILE: Stack vertically */
     @media (max-width: 900px) {
-        .auth-container { grid-template-columns: 1fr; height: auto; overflow-y: auto; }
+        .auth-container { grid-template-columns: 1fr; height: auto; }
         .auth-brand-side { display: none; } 
         .auth-form-side { padding: 80px 20px 40px; min-height: 100vh; }
     }
 </style>
 
 <div class="auth-container">
-    
-    <div class="floating-theme">
-        <button class="btn-theme" id="themeToggleDesk"><i class="fas fa-desktop"></i></button>
-    </div>
 
     <div class="auth-form-side">
         <a href="{% url 'home' %}" class="text-decoration-none fw-bold small mb-4" style="color: var(--text-muted);">
@@ -113,20 +105,28 @@
             </div>
 
             <form method="POST">
-    {% csrf_token %}
-    
-    <input type="text" name="username" class="modern-input" placeholder="Username" required>
-    
-    <input type="password" name="password" class="modern-input" placeholder="Password" required>
-    
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{% url 'password_reset' %}" class="small text-decoration-none" style="color: var(--primary); font-weight: 600;">
-            Forgot Password?
-        </a>
-    </div>
+                {% csrf_token %}
 
-    <button type="submit" class="btn-submit">Sign In</button>
-</form>
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <input type="text" name="username" class="modern-input" placeholder="Username" required>
+
+                <input type="password" name="password" class="modern-input" placeholder="Password" required>
+
+                <div class="d-flex justify-content-end mb-3">
+                    <a href="{% url 'password_reset' %}" class="small text-decoration-none" style="color: var(--primary); font-weight: 600;">
+                        Forgot Password?
+                    </a>
+                </div>
+
+                <button type="submit" class="btn-submit">Sign In</button>
+            </form>
 
             <p class="text-center mt-4 small" style="color: var(--text-muted);">
                 New here? <a href="{% url 'register' %}" class="fw-bold text-decoration-none" style="color: var(--primary);">Create Account</a>
@@ -142,4 +142,3 @@
     </div>
 </div>
 {% endblock %}
-

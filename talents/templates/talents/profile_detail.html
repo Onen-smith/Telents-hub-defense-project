@@ -103,7 +103,7 @@
                     {% if request.user == profile.user %}
                         <a href="{% url 'profile_update' %}" class="btn btn-outline-dark rounded-pill px-4 fw-bold">Edit Profile</a>
                     {% else %}
-                        <button class="btn btn-primary rounded-pill px-5 fw-bold shadow-lg">Hire Me</button>
+                        <a href="{% url 'hire_freelancer' profile.user.id %}" class="btn btn-primary rounded-pill px-5 fw-bold shadow-lg">Hire Me</a>
                         <button class="btn btn-light border rounded-circle" style="width:45px; height:45px;"><i class="far fa-envelope"></i></button>
                     {% endif %}
                     <a href="{% url 'chat_detail' profile.user.username %}" class="btn btn-outline-primary rounded-pill px-4">
@@ -177,7 +177,7 @@
                 
                 <div class="d-flex justify-content-between mb-3">
                     <span class="text-muted"><i class="fas fa-dollar-sign w-25px"></i> Hourly Rate</span>
-                    <span class="fw-bold">${{ profile.hourly_rate|default:"0" }}</span>
+                    <span class="fw-bold">₦{{ profile.hourly_rate|default:"0" }}</span>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
                     <span class="text-muted"><i class="fas fa-briefcase w-25px"></i> Experience</span>

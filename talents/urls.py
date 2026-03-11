@@ -27,8 +27,8 @@ urlpatterns = [
     path('profile/<slug:slug>/', views.profile_detail, name='profile_detail'),
     path('browse/', views.browse, name='browse'), # Talent Directory
 
-    # --- 5. JOBS (THE MISSING PART) ---
-    path('find-work/', views.job_list, name='job_list'),  # <--- THIS WAS MISSING
+    # --- 5. JOBS ---
+    path('find-work/', views.job_list, name='job_list'),
     path('post-job/', views.post_job, name='post_job'),
     path('my-jobs/', views.my_jobs, name='my_jobs'),
     path('job/<slug:slug>/', views.job_detail, name='job_detail'),
@@ -38,14 +38,20 @@ urlpatterns = [
     path('job/<slug:slug>/edit/', views.edit_job, name='edit_job'),
     path('proposal/<int:proposal_id>/hire/', views.create_contract, name='create_contract'),
     path('contract/<int:pk>/', views.contract_detail, name='contract_detail'),
+    
+    # --- 6. MESSAGES ---
     path('messages/', views.inbox, name='inbox'),
     path('messages/<str:username>/', views.chat_detail, name='chat_detail'),
-    path('api/send-message/', views.send_message_ajax, name='send_message_ajax'),
+    
+    # --- 7. WALLET & PAYMENTS ---
     path('wallet/', views.wallet, name='wallet'),
+    path('payment/checkout/<str:reference>/', views.payment_checkout, name='payment_checkout'),
+    path('payment/verify/<str:reference>/', views.verify_payment, name='verify_payment'),
+    
+    # --- 8. SETTINGS & UTILS ---
+    path('settings/', views.settings_view, name='settings'),
     path('verify-identity/', views.verify_identity, name='verify_identity'),
     path('leave-review/', views.leave_review, name='leave_review'),
     path('profile/@<str:username>/', views.public_profile, name='profile_view'),    
-    path('settings/', views.settings_view, name='settings'),
-    path('payment/checkout/<str:reference>/', views.payment_checkout, name='payment_checkout'),
-    path('payment/verify/<str:reference>/', views.verify_payment, name='verify_payment'),
+    path('hire/<int:freelancer_id>/', views.hire_freelancer, name='hire_freelancer'),
 ]

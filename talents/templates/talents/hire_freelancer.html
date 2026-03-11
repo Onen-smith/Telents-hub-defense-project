@@ -1,0 +1,124 @@
+{% extends 'talents/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .hire-container {
+        max-width: 600px;
+        margin: 80px auto;
+    }
+
+    .hire-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .freelancer-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--bg-body);
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .freelancer-ghost {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin: 0 auto 20px;
+    }
+
+    .form-select-custom {
+        background: var(--bg-body);
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        border-radius: 12px;
+        padding: 12px;
+        width: 100%;
+        outline: none;
+        margin-bottom: 25px;
+    }
+
+    .btn-hire-now {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 14px 40px;
+        border-radius: 50px;
+        font-weight: 800;
+        width: 100%;
+        transition: 0.2s;
+    }
+
+    .btn-hire-now:hover {
+        transform: translateY(-2px);
+        opacity: 0.9;
+    }
+
+    .empty-jobs-box {
+        padding: 20px;
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px dashed #ffc107;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="container">
+    <div class="hire-container">
+        <div class="hire-card">
+            {% if freelancer.profile.profile_pic %}
+                <img src="{{ freelancer.profile.profile_pic.url }}" class="freelancer-avatar">
+            {% else %}
+                <div class="freelancer-ghost">
+                    {{ freelancer.username|first|upper }}
+                </div>
+            {% endif %}
+
+            <h2 class="fw-bold mb-1" style="color: var(--text-main)">Hire {{ freelancer.first_name|default:freelancer.username }}</h2>
+            <p class="text-muted mb-4">Directly hire this talent for one of your projects.</p>
+
+            {% if client_jobs %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="text-start mb-3">
+                        <label class="small fw-bold text-muted text-uppercase mb-2 d-block">Select an active job</label>
+                        <select class="form-select-custom" name="job_id" required>
+                            {% for job in client_jobs %}
+                                <option value="{{ job.id }}">{{ job.title }} (₦{{ job.budget }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-hire-now">
+                        Send Offer & Hire
+                    </button>
+                </form>
+            {% else %}
+                <div class="empty-jobs-box">
+                    <p class="mb-2 fw-bold" style="color: var(--text-main)">No open jobs found</p>
+                    <p class="small text-muted mb-3">You need an active job post to hire a freelancer directly.</p>
+                    <a href="{% url 'post_job' %}" class="btn btn-sm btn-warning rounded-pill px-4 fw-bold">Post a Job First</a>
+                </div>
+            {% endif %}
+
+            <div class="mt-4">
+                <a href="{% url 'profile_view' freelancer.username %}" class="text-decoration-none small fw-bold text-primary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

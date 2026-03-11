@@ -10,7 +10,7 @@
 
 <style>
     /* Reuse Login Styles */
-    .auth-container { display: grid; grid-template-columns: 450px 1fr; height: 100vh; width: 100vw; overflow: hidden; background-color: var(--bg-body); }
+    .auth-container { display: grid; grid-template-columns: 450px 1fr; height: 100vh; width: 100vw; background-color: var(--bg-body); }
     .auth-form-side { padding: 40px; display: flex; flex-direction: column; justify-content: center; background: var(--bg-body); overflow-y: auto; }
     
     .auth-brand-side { 
@@ -36,21 +36,15 @@
     .back-link-anchor { position: absolute; top: 30px; left: 40px; text-decoration: none; font-weight: 700; font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
     .back-link-anchor:hover { color: var(--text-main); }
     
-    .floating-theme { position: absolute; top: 20px; right: 20px; z-index: 100; }
-
     @media (max-width: 900px) {
-        .auth-container { grid-template-columns: 1fr; }
+        .auth-container { grid-template-columns: 1fr; height: auto; }
         .auth-brand-side { display: none; }
         .auth-form-side { padding: 80px 20px 40px; min-height: 100vh; }
     }
 </style>
 
 <div class="auth-container">
-    
-    <div class="floating-theme">
-        <button class="btn-theme" id="themeToggleDesk"><i class="fas fa-desktop"></i></button>
-    </div>
-    
+
     <div class="auth-form-side">
         <a href="{% url 'home' %}" class="back-link-anchor">
             <i class="fas fa-arrow-left"></i> Back

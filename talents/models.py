@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 from django.utils import timezone
-import uuid 
+import uuid
 
 # 1. Abstract Base Model (Professional Standard)
 class TimeStampedModel(models.Model):
@@ -241,16 +241,15 @@ class Conversation(TimeStampedModel):
         return f"Chat {self.id}"
 
 # Update Message model to link to Conversation
-class Message(models.Model):
+class Message(TimeStampedModel):
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages', null=True)
     sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
     recipient = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
     content = models.TextField()
-    timestamp = models.DateTimeField(default=timezone.now)
-    is_read = models.BooleanField(default=False)
+    read_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = ['timestamp'] # Oldest first (like a real chat log)
+        ordering = ['created_at'] # Oldest first (like a real chat log)
 
     def __str__(self):
         return f"From {self.sender} to {self.recipient}"
