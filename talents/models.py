@@ -76,6 +76,9 @@ class Profile(TimeStampedModel):
     is_verified = models.BooleanField(default=False)
     onboarding_complete = models.BooleanField(default=False)
 
+    # --- SOCIAL ---
+    follows = models.ManyToManyField('self', related_name='followers', symmetrical=False, blank=True)
+
     # Helper method to check if profile is "Complete"
     def is_complete(self):
         # Returns True if essential fields are filled

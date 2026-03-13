@@ -26,6 +26,7 @@ urlpatterns = [
     path('profile/edit/', views.profile_update, name='profile_update'),
     path('profile/<slug:slug>/', views.profile_detail, name='profile_detail'),
     path('browse/', views.browse, name='browse'), # Talent Directory
+    path('follow/<int:profile_id>/', views.toggle_follow, name='toggle_follow'),
 
     # --- 5. JOBS ---
     path('find-work/', views.job_list, name='job_list'),

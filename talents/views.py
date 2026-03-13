@@ -129,12 +129,17 @@ def profile_detail(request, slug):
     reviews = profile.reviews.select_related('author').order_by('-created_at')
     avg_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
     
+    is_following = False
+    if request.user.is_authenticated and request.user != profile.user:
+        is_following = request.user.profile.follows.filter(id=profile.id).exists()
+
     context = {
         'profile': profile,
         'form': form,
         'reviews': reviews,
         'avg_rating': round(avg_rating, 1),
-        'review_count': reviews.count()
+        'review_count': reviews.count(),
+        'is_following': is_following,
     }
     return render(request, 'talents/profile_detail.html', context)
 
@@ -420,6 +425,7 @@ def job_detail(request, slug):
     return render(request, 'talents/job_detail.html', context)
 
 
+@login_required
 def apply_to_job(request, slug):
     job = get_object_or_404(Job, slug=slug)
 
@@ -601,10 +607,36 @@ def notifications(request):
 
 @login_required
 def inbox(request):
-    # Find all conversations the user is a participant in
-    conversations = Conversation.objects.filter(participants=request.user).annotate(
-        last_message_time=Max('messages__created_at')
-    ).order_by('-last_message_time')
+    # 1. Find all users I have exchanged messages with
+    # We get all messages where I am sender OR recipient
+    messages = Message.objects.filter(
+        Q(sender=request.user) | Q(recipient=request.user)
+    )
+    
+    # 2. Extract unique users from those messages
+    # We use a set to avoid duplicates
+    active_conversations = set()
+    for m in messages:
+        if m.sender != request.user:
+            active_conversations.add(m.sender)
+        if m.recipient != request.user:
+            active_conversations.add(m.recipient)
+            
+    # 3. For each user, get the last message (for the preview text)
+    conversations = []
+    for user in active_conversations:
+        last_msg = Message.objects.filter(
+            Q(sender=request.user, recipient=user) | 
+            Q(sender=user, recipient=request.user)
+        ).latest('timestamp')
+        
+        conversations.append({
+            'user': user,
+            'last_message': last_msg
+        })
+    
+    # Sort conversations by newest message first
+    conversations.sort(key=lambda x: x['last_message'].timestamp, reverse=True)
 
     context = {
         'conversations': conversations
@@ -615,36 +647,31 @@ def inbox(request):
 def chat_detail(request, username):
     other_user = get_object_or_404(User, username=username)
     
-    # Try to find an existing conversation or create a new one
-    conversation = Conversation.objects.filter(participants=request.user).filter(participants=other_user).first()
-    if not conversation:
-        conversation = Conversation.objects.create()
-        conversation.participants.add(request.user, other_user)
+    # 1. Mark all messages from them as read
+    Message.objects.filter(sender=other_user, recipient=request.user, read_at__isnull=True).update(read_at=timezone.now())
     
-    # Handle message sending
+    # 2. Fetch Chat History
+    messages = Message.objects.filter(
+        Q(sender=request.user, recipient=other_user) | 
+        Q(sender=other_user, recipient=request.user)
+    ).order_by('created_at')
+    
+    # Handle new message submission
     if request.method == "POST":
         content = request.POST.get('content')
         if content:
             Message.objects.create(
-                conversation=conversation,
                 sender=request.user,
                 recipient=other_user,
                 content=content
             )
-            return redirect('chat_detail', username=username)
-
-    # Mark messages from the other user as read
-    Message.objects.filter(conversation=conversation, sender=other_user, read_at__isnull=True).update(read_at=timezone.now())
-    
-    # Fetch chat history for this conversation
-    messages = Message.objects.filter(conversation=conversation).order_by('created_at')
-    
+            return redirect('chat_detail', username=other_user.username)
+            
     context = {
         'other_user': other_user,
-        'chat_messages': messages,
-        'conversation': conversation
+        'chat_messages': messages
     }
-    return render(request, 'talents/inbox.html', context)
+    return render(request, 'talents/inbox.html', context) # Use the same template
 
 @login_required
 def post_job(request):
@@ -668,8 +695,8 @@ def post_job(request):
                         job.skills_required.add(skill)
             else:
                 form.save_m2m() # Fallback to standard handling
-
-            messages.success(request, "Job updated successfully!")
+            
+            messages.success(request, "Job posted successfully!")
             return redirect('job_list')
     else:
         form = JobForm()
@@ -773,7 +800,15 @@ def leave_review(request):
 def public_profile(request, username):
     # Get the user by username (or 404 if not found)
     profile_user = get_object_or_404(User, username=username)
-    return render(request, 'talents/public_profile.html', {'profile_user': profile_user})
+    
+    is_following = False
+    if request.user.is_authenticated and request.user != profile_user:
+        is_following = request.user.profile.follows.filter(id=profile_user.profile.id).exists()
+        
+    return render(request, 'talents/public_profile.html', {
+        'profile_user': profile_user,
+        'is_following': is_following
+    })
 
 
 @login_required
@@ -899,3 +934,22 @@ def hire_freelancer(request, freelancer_id):
         'client_jobs': client_jobs,
     }
     return render(request, 'talents/hire_freelancer.html', context)
+
+@login_required
+def toggle_follow(request, profile_id):
+    target_profile = get_object_or_404(Profile, id=profile_id)
+    user_profile = request.user.profile
+    
+    if target_profile in user_profile.follows.all():
+        user_profile.follows.remove(target_profile)
+        # messages.info(request, f"You unfollowed {target_profile.user.username}.")
+    else:
+        user_profile.follows.add(target_profile)
+        # Notify the user
+        Notification.objects.create(
+            user=target_profile.user,
+            message=f"{request.user.username} started following you."
+        )
+        # messages.success(request, f"You are now following {target_profile.user.username}.")
+        
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
